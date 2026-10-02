@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- The Pi `visual_explainer` tool honors `VISUAL_EXPLAINER_OUTPUT_DIR` for `render` and `render_quick`, like the MCP server. The default stays `~/.agent/diagrams/`; a configured directory must not be a symlink and must resolve to itself, and filenames stay basenames inside it. `/fact-check` without an argument looks in the same directory. Thanks to [@eaxeax](https://github.com/eaxeax) for #99.
+
 ### Changed
 - Rewrote the skill to be figure-first and about 61% smaller (83% fewer lines). The first screen shows the answer as a picture plus one sentence, figures lead every section, and prose follows a Simplified Technical English style.
 - Hand-drawn inline SVG is now the default diagram. Mermaid is reserved for sequence, ER, class, git graph, and large graphs where automatic layout helps.
@@ -18,6 +21,9 @@
 
 ### Fixed
 - Slide resume no longer stops between slides, because the jump is instant instead of smooth. Saving the resume position no longer depends on `history.replaceState`, which fails on `file://` pages. The outline and help dialog has an accessible name again.
+
+### Security
+- Pi renders are written to a temporary file and renamed into place, like MCP renders, so a render target swapped for a symlink after the check is replaced instead of written through. Re-rendering an existing file keeps its permission bits.
 
 ## [0.11.0] - 2026-08-28
 

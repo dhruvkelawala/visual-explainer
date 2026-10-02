@@ -71,7 +71,7 @@ The package manifest advertises the canonical skill, command templates, and Pi t
 }
 ```
 
-The Pi extension registers one native `visual_explainer` tool. Use `action: "prepare"` to plan a visual explanation after generating or reviewing a substantial plan, architecture, diff, or implementation, and `action: "render"` to write complete HTML pages to `~/.agent/diagrams/`. The opt-in `action: "render_quick"` validates a compact JSON spec and renders it with the bundled local renderer. Render actions can open with `viewer: "browser"` by default, `viewer: "glimpse"` when `glimpseui` is installed, or `viewer: "auto"` to try Glimpse and fall back to the browser. `/generate-web-diagram` remains the bundled prompt template command.
+The Pi extension registers one native `visual_explainer` tool. Use `action: "prepare"` to plan a visual explanation after generating or reviewing a substantial plan, architecture, diff, or implementation, and `action: "render"` to write complete HTML pages to `~/.agent/diagrams/`, or to `VISUAL_EXPLAINER_OUTPUT_DIR` when set, with the same output jail as the MCP server. The opt-in `action: "render_quick"` validates a compact JSON spec and renders it with the bundled local renderer. Render actions can open with `viewer: "browser"` by default, `viewer: "glimpse"` when `glimpseui` is installed, or `viewer: "auto"` to try Glimpse and fall back to the browser. `/generate-web-diagram` remains the bundled prompt template command.
 
 If you previously used the old curl/manual installer, remove those copied files before using `pi install`; otherwise Pi will report skill and prompt conflicts because the user-level copies shadow the package resources:
 
@@ -519,7 +519,7 @@ Pages are figure-first: the first screen shows the answer as a picture and one s
 
 - Generated HTML is portable and self-contained, but auto-opening depends on the harness, browser access, and sandbox rules.
 - PPTX export is a static best-effort handoff. The HTML deck remains the source of truth for full visual fidelity.
-- All harnesses write visual output to `~/.agent/diagrams/` unless the user asks for a different path.
+- All harnesses write visual output to `~/.agent/diagrams/` unless the user asks for a different path. The Pi tool and the MCP server write to `VISUAL_EXPLAINER_OUTPUT_DIR` instead when it is set.
 - Switching OS theme requires a page refresh for Mermaid SVGs.
 - Results vary by model capability.
 
