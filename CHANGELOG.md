@@ -1,6 +1,8 @@
 # Changelog
 
 ## [Unreleased]
+### Added
+- `/generate-video` makes a narrated MP4. The agent writes a video deck, an HTML file whose scenes carry their narration. `visual-explainer-video` then records it at 1080p on a virtual clock, so motion never stutters and each sentence's picture appears with its voice. Narration uses clips from ElevenLabs, Seed Audio, OpenAI, or xAI when a key is set. Without a key, the video is silent with captions. `--stills` saves one picture per scene to check before rendering. The same command can record a walkthrough of a live web app.
 
 ### Added
 - `/generate-visual-plan` makes a plan you answer in the page instead of a page you only read. It opens on the change as a drawing whose numbered parts match a short tree of claims. You pick options for the decisions the agent cannot make alone, mark its guesses right or wrong, and comment on any words you select. Then you approve or request changes and paste one response back. Changing an option redraws the figure and updates the file count. Keyboard shortcuts and saved answers make long plans quick to get through.
