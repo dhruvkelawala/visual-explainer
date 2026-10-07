@@ -1,25 +1,37 @@
-/* Plan pages: the Blueprint register from references/style-guide.md, the diagram kit from templates/page.html, and the plan parts.
-   plan/render.mjs inlines this file. The page's own <style> comes after it, so a topic accent can override any token. */
+/* Plan pages: the Field Guide house style (references/field-guide.md), the diagram kit from templates/page.html, and the plan parts.
+   plan/render.mjs inlines this file. The page's own <style> comes after it, so a topic accent can override any token.
+   Light is the default. Dark redefines tokens only: it follows the system until the reader picks a scheme with the switch. */
 :root {
-  color-scheme: light dark;
-  --bg: #0d1520; --surface: #132031; --border: #22324a; --border-bright: #596b87;
-  --text: #e3ecf5; --text-dim: #92a6bb; --accent: #ffb547; --accent-dim: rgba(255,181,71,.14);
-  --ok: #6fd3a0; --warn: #e8d36a; --risk: #ff7b6b; --info: #7cc0f0;
-  --node-top: color-mix(in srgb, var(--text) 7%, var(--surface)); --lift: rgb(0 0 0 / .45); --halo: 32%;
-  --font-body: 'IBM Plex Sans', 'Segoe UI', sans-serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
-  --t-label: .75rem; --t-small: .875rem; --t-body: 1rem; --t-lead: 1.25rem; --t-h2: 1.625rem; --t-h1: clamp(2.25rem, 5.5vw, 4rem);
+  color-scheme: light;
+  --bg: #f4efe6; --surface: #fbf8f2; --border: #d6cfc2; --border-bright: #121212;
+  --text: #121212; --text-dim: #55504a; --accent: #1f4bd8; --accent-dim: rgba(31,75,216,.12);
+  --ok: #2d6a3e; --warn: #8a6400; --risk: #b0341a; --info: #55504a;
+  --node-top: var(--surface); --lift: #121212; --halo: 0%;
+  --cobalt: #1f4bd8; --tomato: #ef5a3c; --butter: #f6d44c; --on-field: #121212;
+  --font-body: 'Instrument Sans', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-display: 'Bricolage Grotesque', 'Instrument Sans', sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --t-label: .75rem; --t-small: .875rem; --t-body: 1rem; --t-lead: 1.25rem; --t-h2: 1.75rem; --t-h1: clamp(2.6rem, 6vw, 4.6rem);
   --s-1: .25rem; --s-2: .5rem; --s-3: .75rem; --s-4: 1rem; --s-5: 1.5rem; --s-6: 2rem; --s-7: 3rem; --s-8: 4.5rem;
-  --r-1: 4px; --r-2: 10px;
+  --r-1: 2px; --r-2: 2px;
   --ease: cubic-bezier(.16,1,.3,1); --fast: 150ms; --med: 300ms; --slow: 500ms;
-  --grid: color-mix(in srgb, var(--border) 45%, transparent);
+  --grid: transparent;
 }
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #f2f6fa; --surface: #ffffff; --border: #d6e0ea; --border-bright: #818f9e;
-    --text: #0f1a26; --text-dim: #4d6074; --accent: #a34700; --accent-dim: rgba(163,71,0,.12);
-    --ok: #1c7443; --warn: #776300; --risk: #b0341e; --info: #145f99;
-    --node-top: var(--surface); --lift: rgb(18 22 20 / .12); --halo: 22%;
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #14120f; --surface: #1d1a16; --border: #3a352e; --border-bright: #f1ebe0;
+  --text: #f1ebe0; --text-dim: #b3aa9b; --accent: #8ea6ff; --accent-dim: rgba(142,166,255,.16);
+  --ok: #7cc493; --warn: #f6d44c; --risk: #ff8d73; --info: #b3aa9b;
+  --lift: #000;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #14120f; --surface: #1d1a16; --border: #3a352e; --border-bright: #f1ebe0;
+    --text: #f1ebe0; --text-dim: #b3aa9b; --accent: #8ea6ff; --accent-dim: rgba(142,166,255,.16);
+    --ok: #7cc493; --warn: #f6d44c; --risk: #ff8d73; --info: #b3aa9b;
+    --lift: #000;
   }
 }
 
@@ -219,7 +231,7 @@ details.call-x[open] > summary .nm::after { content: ' ▾'; }
 .mock-pins { padding-left: var(--s-5); font-size: var(--t-small); color: var(--text-dim); display: grid; gap: var(--s-1); max-width: 65ch; }
 .mock-pins li::marker { font: 600 var(--t-label) var(--font-mono); color: var(--accent); }
 
-/* hand-drawn figures (references/diagrams.md); the hero stage uses Blueprint's line grid */
+/* hand-drawn figures (references/diagrams.md) */
 figure { min-width: 0; }
 .frame { background: radial-gradient(circle at 1px 1px, color-mix(in srgb, var(--text) 13%, transparent) 1px, transparent 1.5px) 0 0 / 20px 20px, var(--bg); border: 1px solid var(--border); border-radius: var(--r-1); padding: var(--s-5); overflow-x: auto; }
 .hero .frame { background: linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 24px 24px, linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 24px 24px, var(--surface); padding: var(--s-4); }
@@ -324,7 +336,7 @@ dialog.ve-respond::backdrop { background: rgb(5 10 16 / .55); }
 }
 
 @media print {
-  :root { --bg: #fff; --surface: #fff; --border: #d6e0ea; --border-bright: #818f9e; --text: #0f1a26; --text-dim: #4d6074; --accent: #a34700; --accent-dim: rgba(163,71,0,.12); --ok: #1c7443; --warn: #776300; --risk: #b0341e; --info: #145f99; --node-top: #fff; --grid: transparent; }
+  :root { --bg: #fff; --surface: #fff; --border: #d6cfc2; --border-bright: #121212; --text: #121212; --text-dim: #55504a; --accent: #1f4bd8; --accent-dim: rgba(31,75,216,.12); --ok: #2d6a3e; --warn: #8a6400; --risk: #b0341a; --info: #55504a; --node-top: #fff; --lift: #121212; --grid: transparent; }
   body { background: #fff; }
   .ve-bar, .plan-meta .tools, .c-note-btn, .ve-dots, .guess input { display: none !important; }
   .plan-grid { display: block; } .plan-hero { position: static; margin-bottom: var(--s-5); }
@@ -333,3 +345,86 @@ dialog.ve-respond::backdrop { background: rgb(5 10 16 / .55); }
   svg * { filter: none !important; }
   .js-motion main > * { opacity: 1 !important; transform: none !important; }
 }
+
+/* ── Field Guide house style (references/field-guide.md) ─────────────────────────────
+   Kept as one block after the upstream rules, so upstream merges rarely touch it. */
+body { background: var(--bg); }
+::selection { background: var(--butter); color: var(--on-field); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+h1, h2 { font-family: var(--font-display); }
+h1 { font-weight: 800; letter-spacing: -.045em; line-height: .98; max-width: 18ch; }
+h2 { font-weight: 700; letter-spacing: -.025em; }
+h1 em, h2 em, .lead em { font: italic 400 1.06em var(--font-serif); letter-spacing: 0; }
+.eyebrow { color: var(--text); }
+.eyebrow::before { width: 1.75rem; height: 3px; background: var(--accent); }
+.plan-page > header { padding-bottom: var(--s-5); border-bottom: 3px solid var(--text); }
+button { border: 2px solid var(--text); border-radius: 0; box-shadow: 3px 3px 0 var(--lift); font-weight: 600; }
+button:hover, button:focus-visible { border-color: var(--text); background: color-mix(in srgb, var(--butter) 35%, var(--surface)); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--lift); }
+.plan-meta .tools button { box-shadow: 2px 2px 0 var(--lift); }
+.stat-tag { border: 1.5px solid var(--text); }
+.revision, .ask, dialog.ve-respond { border: 3px solid var(--text); border-radius: 0; box-shadow: 6px 6px 0 var(--lift); }
+.ask[data-state="todo"] { border-color: var(--text); box-shadow: 6px 6px 0 var(--butter), 6px 6px 0 3px var(--text); }
+.ask[data-state="todo"] legend { color: var(--text); }
+.ask[data-state="todo"] legend b { background: var(--butter); color: var(--on-field); padding: 0 .3em; }
+.ask-q { font-family: var(--font-display); font-weight: 700; letter-spacing: -.02em; }
+.opt { border: 2px solid var(--border); border-radius: 0; background: var(--surface); }
+.opt:hover { border-color: var(--text); }
+.opt:has(input:checked) { border-color: var(--text); background: var(--butter); color: var(--on-field); }
+.opt:has(input:checked) small, .opt:has(input:checked) .sug, .opt:has(input:checked) .opt-cost { color: #3d3a35; }
+.opt:has(input:checked) .opt-cost .goes { color: #8f2812; }
+.guess { border: 2px dashed var(--warn); border-radius: 0; }
+.code, .calls { border: 2px solid var(--text); border-radius: 0; }
+.code-head, .calls-head, .excerpt-head { border-bottom: 2px solid var(--text); background: var(--bg); }
+.excerpt { border: 1.5px solid var(--text); border-radius: 0; }
+.pin-text { border: 1.5px solid var(--text); border-radius: 0; background: var(--butter); color: var(--on-field); }
+.frame { background: var(--surface); border: 3px solid var(--text); border-radius: 0; box-shadow: 8px 8px 0 var(--lift); }
+.hero .frame { background: var(--surface); }
+.mock-stage { border: 2px solid var(--text); border-radius: 0; background: var(--bg); }
+.fig-n { text-transform: uppercase; letter-spacing: .06em; }
+.chip { border: 2px solid currentColor; border-radius: 99px; padding: 1px var(--s-2) 1px .4rem; }
+/* claim numbers are ink badges; a lit claim turns butter, like a selected stage in a plate key */
+.claim[data-l="1"] > summary > .c-no { border: 0; background: var(--text); color: var(--surface); }
+.claim[data-l="1"][data-aux] > summary > .c-no { border: 2px dashed var(--text); background: transparent; color: var(--text); }
+.claim[data-l="1"] > summary.is-lit > .c-no, .claim[data-l="1"] > summary:hover > .c-no { border: 0; background: var(--butter); color: var(--on-field); box-shadow: 0 0 0 2px var(--text); }
+.claim > summary:hover, .claim > summary.is-lit { background: color-mix(in srgb, var(--butter) 22%, transparent); }
+.claim[data-l="1"] > summary { border-top: 1.5px solid var(--text); }
+.claim[data-l="1"] > summary > .c-text { font-family: var(--font-display); font-weight: 700; letter-spacing: -.015em; }
+.c-body { border-left: 2px solid var(--border); }
+.c-asks.todo { color: var(--text); background: var(--butter); color: var(--on-field); padding: 0 .35em; }
+.progress .bar { height: .65rem; }
+.done th { border-bottom: 3px solid var(--text); }
+/* diagram kit: square ink nodes with hard shadows; the key node is a cobalt field; no glows */
+.ve-n .sh { fill: var(--surface); stroke: var(--text); stroke-width: 2.5; filter: drop-shadow(3px 3px 0 var(--lift)); }
+.ve-n.is-key .sh { fill: var(--cobalt); stroke: var(--text); stroke-width: 2.5; filter: drop-shadow(4px 4px 0 var(--lift)); }
+.ve-n.is-key text { fill: #fff; } .ve-n.is-key .sub { fill: #e6ebff; } .ve-n.is-key .gl { stroke: #fff; }
+.ve-n.is-new .sh { stroke: var(--ok); stroke-width: 2.5; }
+.ve-n.is-gone .sh { stroke: var(--risk); stroke-width: 2.5; }
+.ve-n text { font-family: var(--font-display); font-weight: 700; }
+.ve-e { stroke: var(--text); stroke-width: 2; }
+.ve-e.is-hot { stroke: var(--accent); stroke-width: 4; filter: none; }
+.ve-el { font: italic 400 17px var(--font-serif); fill: var(--text); }
+.hero .ve-el { font-size: 18px; }
+.ve-co circle { fill: var(--text); stroke: var(--surface); stroke-width: 3; }
+.ve-co text { fill: var(--surface); }
+.ve-co.is-lit circle { fill: var(--butter); stroke: var(--text); } .ve-co.is-lit text { fill: var(--on-field); }
+.ve-dots circle { fill: var(--surface); } .ve-dots .hit { fill: var(--butter); filter: none; }
+.ve-n.is-lit .sh { stroke: var(--accent); stroke-width: 3; }
+.ve-ref.is-lit { background: color-mix(in srgb, var(--butter) 45%, transparent); text-decoration-color: var(--text); }
+.ve-bar button { box-shadow: 4px 4px 0 var(--lift); }
+.ve-bar .next { border-color: var(--text); color: var(--text); }
+.ve-bar .respond .n { background: var(--butter); color: var(--on-field); }
+.r-row { border: 1.5px solid var(--border); } .r-row.todo { border-color: var(--text); background: color-mix(in srgb, var(--butter) 30%, var(--bg)); }
+.verdict label { border: 2px solid var(--text); border-radius: 0; }
+.verdict label:has(input:checked) { background: var(--butter); color: var(--on-field); }
+.ve-pop, .ve-keys { border: 2px solid var(--text); border-radius: 0; box-shadow: 4px 4px 0 var(--lift); }
+.ve-toast { border-radius: 0; }
+/* light/dark switch (render.mjs adds the markup) */
+.fg-theme { position: fixed; top: 14px; right: 14px; z-index: 21; display: flex; border: 2px solid var(--text); background: var(--surface); box-shadow: 3px 3px 0 var(--lift); }
+.fg-theme button { all: unset; cursor: pointer; font: 600 .7rem/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; padding: 8px 10px; color: var(--text); }
+.fg-theme button + button { border-left: 2px solid var(--text); }
+.fg-theme button[aria-pressed="true"] { background: var(--text); color: var(--surface); }
+.fg-theme button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+html:not(.fg-js) .fg-theme { display: none; }
+@media (max-width: 40rem) { .plan-page { padding-top: calc(var(--s-6) + 2.5rem); } }
+@media print { .fg-theme { display: none; } .frame, .revision, .ask { box-shadow: none; } }

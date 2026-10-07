@@ -1,33 +1,35 @@
 :root {
   color-scheme: light dark;
-  --bg: #f4f1e9;
-  --surface: #fffdf7;
-  --surface-2: #ebe7dc;
-  --border: #c8c1b1;
-  --text: #252a2a;
-  --text-dim: #636b68;
-  --accent: #ad4f32;
-  --positive: #35745c;
-  --warning: #a36d14;
-  --danger: #a33c3c;
-  --info: #356c8c;
-  --shadow: 0 16px 40px rgba(48, 43, 33, 0.09);
+  /* Field Guide house style (references/field-guide.md). Quick pages have no script, so they follow the system scheme. */
+  --bg: #f4efe6;
+  --surface: #fbf8f2;
+  --surface-2: #f4efe6;
+  --border: #121212;
+  --text: #121212;
+  --text-dim: #55504a;
+  --accent: #1f4bd8;
+  --positive: #1f4bd8;
+  --warning: #f6d44c;
+  --danger: #ef5a3c;
+  --info: #55504a;
+  --shadow: 6px 6px 0 #121212;
+  --display: "Bricolage Grotesque", "Instrument Sans", sans-serif;
+  --serif: "Instrument Serif", Georgia, serif;
+  --mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #151a19;
-    --surface: #202624;
-    --surface-2: #29302d;
-    --border: #424b47;
-    --text: #f1eee6;
-    --text-dim: #b0b8b3;
-    --accent: #e28564;
-    --positive: #76b99a;
-    --warning: #e3ad55;
-    --danger: #e37a75;
-    --info: #72acd0;
-    --shadow: 0 18px 48px rgba(0, 0, 0, 0.24);
+    --bg: #14120f;
+    --surface: #1d1a16;
+    --surface-2: #14120f;
+    --border: #f1ebe0;
+    --text: #f1ebe0;
+    --text-dim: #b3aa9b;
+    --accent: #8ea6ff;
+    --positive: #4d72ff;
+    --info: #b3aa9b;
+    --shadow: 6px 6px 0 #000;
   }
 }
 
@@ -36,10 +38,7 @@ html { background: var(--bg); }
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--border) 25%, transparent) 1px, transparent 1px) 0 0 / 32px 32px,
-    linear-gradient(color-mix(in srgb, var(--border) 25%, transparent) 1px, transparent 1px) 0 0 / 32px 32px,
-    var(--bg);
+  background: var(--bg);
   color: var(--text);
   font-family: "Avenir Next", "Trebuchet MS", sans-serif;
   line-height: 1.55;
@@ -126,3 +125,30 @@ tr:last-child td { border-bottom: 0; }
   .risk { grid-template-columns: 1fr; }
   .severity { justify-self: start; }
 }
+
+/* ── Field Guide house style ───────────────────────────────────────────────── */
+body { background: var(--bg); font-family: "Instrument Sans", "Segoe UI", sans-serif; }
+h1, h2 { font-family: var(--display); }
+h1 { font-weight: 800; letter-spacing: -.05em; }
+h2 { font-weight: 700; }
+header { padding-bottom: 22px; border-bottom: 3px solid var(--text); }
+.subtitle, .section-kicker, .chip, .status, th, .severity, .index, .flow-edge, .evidence-source { font-family: var(--mono); }
+.subtitle { color: var(--text); }
+.section { border: 3px solid var(--border); border-top: 10px solid var(--tone, var(--accent)); border-radius: 0; background: var(--surface); }
+.section-kicker { color: var(--text); }
+.card, .risk, .callout, .evidence-item, .flow-node, .table-wrap { border: 2px solid var(--border); border-radius: 0; }
+.card[data-tone], .callout[data-tone], .callout, .flow-node { border-left-width: 8px; }
+.card[data-tone="positive"], .callout[data-tone="positive"] { border-left-color: var(--positive); }
+.card[data-tone="warning"], .callout[data-tone="warning"] { border-left-color: var(--warning); }
+.card[data-tone="danger"], .callout[data-tone="danger"] { border-left-color: var(--danger); }
+.chip, .status { border: 2px solid var(--border); border-radius: 99px; }
+th { border-bottom: 3px solid var(--border); }
+.severity { color: #121212; border: 2px solid #121212; border-radius: 0; }
+.risk[data-severity="low"] .severity { background: var(--positive); color: #fff; }
+.index { border-width: 2px; border-color: var(--text); background: var(--text); color: var(--surface); }
+.evidence-value { font-family: var(--display); font-weight: 800; font-size: 2rem; letter-spacing: -.04em; }
+[data-tone="positive"] { --tone: var(--positive); }
+[data-tone="warning"] { --tone: var(--warning); }
+[data-tone="danger"] { --tone: var(--danger); }
+[data-tone="info"] { --tone: var(--info); }
+.flow-node, .callout { border-left-color: var(--tone, var(--accent)); }

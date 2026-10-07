@@ -62,7 +62,7 @@ Shape the page to the content. These are starting points, not templates: merge, 
 | A setting the reader should feel: TTL, rollout %, a policy | Live figure → `references/diagrams.md` |
 | Slide deck | `references/slides.md` + `templates/slide-deck.html` |
 
-Draw every diagram by hand. Hand-drawn SVG gives exact placement, page fonts, theme tokens, and animation. Use Mermaid only when the user asks for it or supplies Mermaid source (see Known traps). `templates/page.html` is the reference build. Copy its parts (tokens, kit CSS, scripts, components), not its outline, and swap in the register the content needs.
+Draw every diagram by hand. Hand-drawn SVG gives exact placement, page fonts, theme tokens, and animation. Use Mermaid only when the user asks for it or supplies Mermaid source (see Known traps). `templates/field-guide.html` is the reference build (house style); `templates/page.html` stays the reference for diagram-kit patterns that page lacks. Copy their parts (tokens, kit CSS, scripts, components), not their outline.
 
 ## Words
 
@@ -77,14 +77,18 @@ Write about 80% of the way to ASD-STE100 (Simplified Technical English):
 
 ## Look
 
+<!-- house-style:field-guide -->
+**House style: Field Guide.** Every page uses the Field Guide look by default, in light and dark with a switch. Read `references/field-guide.md`, then build from `templates/field-guide.html`. It overrides the register table below and the style guide's palettes, fonts and components where they differ. Never use Blueprint. Use Instrument, Paper or Editorial only when the user names one.
+<!-- /house-style:field-guide -->
+
 Aim for the standard of the best research and engineering pages: exact, calm, visual, and specific to the subject. The reader should feel that someone who understands the system drew every line on purpose, for this topic and no other.
 
-Always read `references/style-guide.md` before HTML. Precedence: the user's words → the project's design system → the style guide.
+Always read `references/style-guide.md` and then `references/field-guide.md` before HTML. Precedence: the user's words → the project's design system → the style guide.
 
 ```
 content ──► register ──────────► subject ──► topic motif (2–3 touches)
 reviews, metrics   Instrument    Geist · near-black · amber        accent hue from the subject
-architecture       Blueprint     IBM Plex · blue-black grid        stage texture · glyphs
+architecture       Field Guide   Bricolage + Instrument · bone      plates · specimen cards
 concepts, reading  Paper         Newsreader + Atkinson · ink blue  one type habit of the domain
 recaps, decks      Editorial     Instrument Serif + Sans           the domain's diagram convention
 ```
