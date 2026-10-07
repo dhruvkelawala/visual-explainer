@@ -622,13 +622,15 @@ export function renderPlan(source, { root = process.cwd(), editor = process.env.
 ${hasIcon ? "" : FAVICON}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+${THEME_HEAD}
 <style data-ve-plan>
 ${css}
 </style>
 ${keepHead}
 </head>
 <body${bodyAttrs}>
+${THEME_SWITCH}
 ${DEFS}
 <main class="plan-page${hero ? "" : " no-hero"}" data-v="${version}"${sendBack ? " data-send-back" : ""}>
 ${headerHtml}
@@ -645,6 +647,7 @@ ${rest}
 <script data-ve-plan>
 ${js}
 </script>
+${THEME_SCRIPT}
 </body>
 </html>
 `;
@@ -668,7 +671,11 @@ export function renderPlanForHost(html, { root, filename, sendBack = false }) {
   return { html: r.html, filename: page, source, note: ` Plan: ${r.summary}. Source kept beside it as ${source}; edit it and render again for revisions and the build receipt.${warned}` };
 }
 
-const FAVICON = `<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%230d1520'/%3E%3Cpath d='M18 20h28M18 32h20M18 44h12' stroke='%23ffb547' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">`;
+// Field Guide light/dark switch (references/field-guide.md): the head script applies a saved choice before first paint.
+const THEME_HEAD = `<script>(function(){var r=document.documentElement;r.classList.add("fg-js");try{var t=localStorage.getItem("fg-theme");if(t==="light"||t==="dark")r.dataset.theme=t}catch(e){}})();</script>`;
+const THEME_SWITCH = `<div class="fg-theme" role="group" aria-label="Colour scheme"><button type="button" data-theme-set="light" aria-pressed="false">Light</button><button type="button" data-theme-set="dark" aria-pressed="false">Dark</button></div>`;
+const THEME_SCRIPT = `<script>(function(){var r=document.documentElement,b=[].slice.call(document.querySelectorAll("[data-theme-set]")),m=matchMedia("(prefers-color-scheme: dark)");function p(){var c=r.dataset.theme||(m.matches?"dark":"light");b.forEach(function(x){x.setAttribute("aria-pressed",String(x.dataset.themeSet===c))})}b.forEach(function(x){x.addEventListener("click",function(){r.dataset.theme=x.dataset.themeSet;try{localStorage.setItem("fg-theme",x.dataset.themeSet)}catch(e){}p()})});try{m.addEventListener("change",p)}catch(e){}p()})();</script>`;
+const FAVICON = `<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f6d44c'/%3E%3Cpath d='M18 20h28M18 32h20M18 44h12' stroke='%23121212' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">`;
 
 // Shared SVG defs for hand-drawn figures: one arrowhead that follows each edge's color, and the node fill.
 const DEFS = `<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><marker id="ve-ah" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M0 0L10 5L0 10z" fill="context-stroke"/></marker><linearGradient id="ve-node" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--node-top)"/><stop offset="1" style="stop-color:var(--surface)"/></linearGradient></defs></svg>`;
