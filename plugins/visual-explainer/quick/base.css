@@ -152,3 +152,4 @@ th { border-bottom: 3px solid var(--border); }
 [data-tone="danger"] { --tone: var(--danger); }
 [data-tone="info"] { --tone: var(--info); }
 .flow-node, .callout { border-left-color: var(--tone, var(--accent)); }
+.status { border-radius: 2px; }

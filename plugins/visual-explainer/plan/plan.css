@@ -428,3 +428,14 @@ button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--lift
 html:not(.fg-js) .fg-theme { display: none; }
 @media (max-width: 40rem) { .plan-page { padding-top: calc(var(--s-6) + 2.5rem); } }
 @media print { .fg-theme { display: none; } .frame, .revision, .ask { box-shadow: none; } }
+/* Print is always light: these selectors match the dark ones' specificity and come last, so they win. */
+@media print {
+  :root, :root[data-theme], :root:not([data-theme="light"]) {
+    color-scheme: light;
+    --bg: #fff; --surface: #fff; --border: #d6cfc2; --border-bright: #121212;
+    --text: #121212; --text-dim: #55504a; --accent: #1f4bd8; --accent-dim: rgba(31,75,216,.12);
+    --ok: #2d6a3e; --warn: #8a6400; --risk: #b0341a; --info: #55504a; --node-top: #fff; --lift: #121212; --grid: transparent;
+  }
+  body { background: #fff; }
+  .ask[data-state="todo"], .frame, .revision, button { box-shadow: none; }
+}
