@@ -85,6 +85,7 @@ Serif italic marks only these: the tail of a headline (“…five gates. *Any �
 
 ```
 □ light and dark both checked at 728px and 1280px; the switch works, persists, and follows the system before a choice
+□ in T3: the page is light on a light T3 background and dark on a dark one (`html_preview` both appearances), with the switch hidden
 □ one full-width colour field per screen at most; tomato only for risk or failure
 □ no raw tomato or butter text on the ground; SVG colours come from tokens
 □ plate key steps through every stage; dimming is opaque; #gate=N works; everything shows without JS
