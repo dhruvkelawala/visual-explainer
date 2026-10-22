@@ -22,7 +22,7 @@ Climb as high as the request allows. The default output is one HTML page whose s
 ## Deliver
 
 - Write `~/.agent/diagrams/<descriptive-name>.html`, or the path the user gives. One complete file: inline CSS, JS, and SVG favicon. CDN only for fonts and libraries.
-- T3 (the `html_preview` and `html_render` tools exist): the page is a T3 visual page, not a file to open. Read `references/t3.md`, check the page with `html_preview`, then show it with `html_render` before the final reply. Open no browser and send no local path.
+- T3 (the `html_preview` and `html_render` tools exist): the page is a T3 visual page, not a file to open. Read `references/t3.md`, check the page with `html_preview`, then show it with `html_render` before the final reply. Open no browser and send no local path. Slide decks, plan pages and quick pages are not T3 visual pages yet: deliver them as below and give the path.
 - Pi: `visual_explainer` `prepare` → `render` (ask before `prepare` unless a visual was requested). MCP: render tools default to `open:false`. Elsewhere: write the file and open it. Use `viewer:"glimpse"` only on request.
 - If a terminal table would have 4+ rows or 3+ columns, render HTML and reply with one summary line.
 - Write a Markdown companion (`<name>.md` beside the HTML) only when the user asks for AI-readable output or a source brief. HTML stays the source. Ask before you overwrite one.

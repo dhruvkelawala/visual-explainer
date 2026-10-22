@@ -22,7 +22,7 @@ Every claim on the page comes from the cited notes that `research` writes in the
 
 Each block, in this order:
 
-1. **Head.** The section number, the label `Block N`, and an `h2` that states the block's takeaway in plain words ("Models repeat the answer training rewarded", not "Mode collapse").
+1. **Head.** The section number, the label `Block N · <concept>`, and an `h2` that states the block's takeaway in plain words ("Models repeat the answer training rewarded", not "Mode collapse").
 2. **The question.** One short line with the question this block answers, asked from the reader's world ("We asked for creative output. Why did we get the same answer five times?").
 3. **Explanation.** Two or three short paragraphs. Define each term in bold where it first appears. Say why the thing happens, not only that it happens.
 4. **Figure.** One hand-drawn SVG in a `<figure>`. Its caption states the claim and adds to the prose.
@@ -37,7 +37,7 @@ Leave out "TL;DR", "key takeaway", "say it to a friend" and "repeat after me" bo
 |---|---|
 | The one idea | The hero's Field note holds the rule. The three-step strip is a small plate: numbered stage boxes on the spine. |
 | Block head | A section opener: the giant number, the label `Block N · <concept>`, and the `h2`. |
-| The question | The `.lede` under the `h2`. Serif italic marks one or two words at most. |
+| The question | The `.lede` under the `h2`. |
 | In our project | A `--surface` box with a 3px `--fg` border, a cobalt header strip that reads `In our project`, and file paths in mono. |
 | Watch out | A hazards row: a `■ Risk` tomato tag or a `○ Check` butter tag. |
 | Assembly | A plate whose stages are the blocks. Its key steps through them, so **Walk the path** walks the blocks in order. |
