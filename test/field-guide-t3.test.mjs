@@ -11,7 +11,8 @@ const template = readFileSync(
 // Colours from the token table in references/field-guide.md: --fg as text, --surface as a plate.
 const LIGHT = { text: "rgb(18, 18, 18)", surface: "rgb(251, 248, 242)" };
 const DARK = { text: "rgb(241, 235, 224)", surface: "rgb(29, 26, 22)" };
-const BONE_GROUND = "rgb(244, 239, 230)";
+// --bg in dark, the ground a page paints for itself outside T3.
+const DARK_GROUND = "rgb(20, 18, 15)";
 const ON_THREAD = { ground: "rgba(0, 0, 0, 0)", switchShown: false, edge: 0, overflow: 0 };
 
 const DARK_THREAD = { appearance: "dark", background: "#0a0a0a" };
@@ -67,7 +68,7 @@ function look(page) {
   });
 }
 
-function keysOf(expect, seen) {
+function seenFor(expect, seen) {
   return Object.fromEntries(Object.keys(expect).map((key) => [key, seen[key]]));
 }
 
@@ -92,17 +93,17 @@ const cases = [
     expect: { ...ON_THREAD, ...DARK },
   },
   {
-    name: "outside T3 keeps its bone ground, the switch and the system scheme",
+    name: "outside T3 paints its own ground, shows the switch and follows a dark system",
     thread: null,
-    system: "light",
-    expect: { ground: BONE_GROUND, switchShown: true, overflow: 0, ...LIGHT },
+    system: "dark",
+    expect: { ground: DARK_GROUND, switchShown: true, overflow: 0, ...DARK },
   },
 ];
 
 for (const { name, thread, system, expect } of cases) {
   test(`a Field Guide page ${name}`, async () => {
     const page = await open(thread ? inT3(template, thread) : template, { system });
-    assert.deepEqual(keysOf(expect, await look(page)), expect);
+    assert.deepEqual(seenFor(expect, await look(page)), expect);
   });
 }
 
@@ -111,16 +112,20 @@ test("a Field Guide page turns light when the reader switches T3 to light", asyn
   await page.evaluate((css) => {
     document.getElementById("t3-theme").textContent = css;
   }, t3Theme(LIGHT_THREAD));
-  assert.deepEqual(keysOf(LIGHT, await look(page)), LIGHT);
+  assert.deepEqual(seenFor(LIGHT, await look(page)), LIGHT);
 });
 
-test("a Field Guide page keeps its vertical section spacing in T3", async () => {
-  const spacing = async (html) =>
-    (await open(html, { system: "light" })).evaluate(() =>
-      [...document.querySelectorAll(".hero, .sec")].map((el) => {
+// T3 changes only the horizontal layout: T3's 14px root and the T3 block must not shrink the type or the spacing.
+test("a Field Guide page keeps the reference build's type scale and section spacing in T3", async () => {
+  const scale = async (html) =>
+    (await open(html, { system: "light" })).evaluate(() => [
+      ...[...document.querySelectorAll(".hero, .sec")].map((el) => {
         const { paddingTop, paddingBottom } = getComputedStyle(el);
         return `${el.className}: ${paddingTop} ${paddingBottom}`;
       }),
-    );
-  assert.deepEqual(await spacing(inT3(template, DARK_THREAD)), await spacing(template));
+      ...["h1 .num", "h1 .rest", "h2", ".sec-no"].map(
+        (selector) => `${selector}: ${getComputedStyle(document.querySelector(selector)).fontSize}`,
+      ),
+    ]);
+  assert.deepEqual(await scale(inT3(template, DARK_THREAD)), await scale(template));
 });
