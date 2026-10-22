@@ -16,17 +16,18 @@ Every claim on the page comes from the cited notes that `research` writes in the
 | Assembly | One figure that shows how the blocks fit together in the real system, with each node labelled by its block number. Then one sentence on why the parts compound. |
 | Cheat sheet | A glossary of every term of art on the page, each with one plain sentence. |
 | Sources | For each block, its primary sources (papers, docs, repos) and the repo paths of the notes. |
+| Closing line | One mono footer line that says what the page is and what it feeds into. |
 
 ## Block anatomy
 
 Each block, in this order:
 
-1. **Head.** The section number, the label `Block N`, and an `h2` that names the concept in plain words ("Why models repeat themselves", not "Mode collapse").
-2. **The question.** One serif italic line with the question this block answers, asked from the reader's world ("We asked for creative output. Why did we get the same answer five times?").
+1. **Head.** The section number, the label `Block N`, and an `h2` that states the block's takeaway in plain words ("Models repeat the answer training rewarded", not "Mode collapse").
+2. **The question.** One short line with the question this block answers, asked from the reader's world ("We asked for creative output. Why did we get the same answer five times?").
 3. **Explanation.** Two or three short paragraphs. Define each term in bold where it first appears. Say why the thing happens, not only that it happens.
 4. **Figure.** One hand-drawn SVG in a `<figure>`. Its caption states the claim and adds to the prose.
 5. **In our project.** A callout with the reader's real incidents, numbers, thresholds and file paths from the notes. With no project, use one worked example.
-6. **Watch out**, only when needed. The sharp edge: what the source does not claim, limits on calibration, failure modes, and what would test it.
+6. **Watch out**, only when needed. The limits: what the source does not claim, limits on calibration, failure modes, and what would test it.
 
 Leave out "TL;DR", "key takeaway", "say it to a friend" and "repeat after me" boxes. The prose, the figures and the cheat sheet carry the takeaways.
 
@@ -36,11 +37,12 @@ Leave out "TL;DR", "key takeaway", "say it to a friend" and "repeat after me" bo
 |---|---|
 | The one idea | The hero's Field note holds the rule. The three-step strip is a small plate: numbered stage boxes on the spine. |
 | Block head | A section opener: the giant number, the label `Block N · <concept>`, and the `h2`. |
-| The question | The `.lede` under the `h2`, in serif italic. |
+| The question | The `.lede` under the `h2`. Serif italic marks one or two words at most. |
 | In our project | A `--surface` box with a 3px `--fg` border, a cobalt header strip that reads `In our project`, and file paths in mono. |
 | Watch out | A hazards row: a `■ Risk` tomato tag or a `○ Check` butter tag. |
 | Assembly | A plate whose stages are the blocks. Its key steps through them, so **Walk the path** walks the blocks in order. |
 | Cheat sheet | A `<dl>` with mono terms, as in a specimen card. |
+| Closing line | The footer. |
 
 ## Figures that teach
 
