@@ -14,11 +14,20 @@ const DARK = { text: "rgb(241, 235, 224)", surface: "rgb(29, 26, 22)" };
 const BONE_GROUND = "rgb(244, 239, 230)";
 const ON_THREAD = { ground: "rgba(0, 0, 0, 0)", switchShown: false, edge: 0, overflow: 0 };
 
-// What T3's html_render bootstrap puts right after <head>: its theme as variables on :root,
-// and a base sheet that paints html with the thread's background.
-function inT3(html, { appearance, background }) {
-  const theme = `<style id="t3-theme">:root{color-scheme:${appearance};--background:${background}}html{background:var(--background)}body{margin:0}</style>`;
-  return html.replace("<head>", `<head>${theme}`);
+const DARK_THREAD = { appearance: "dark", background: "#0a0a0a" };
+const LIGHT_THREAD = { appearance: "light", background: "#fcfcfc" };
+
+// T3's html_render bootstrap puts one style right after <head>: its theme as variables on :root,
+// then this base sheet, copied from the T3 Code app. A theme switch rewrites the style with both.
+const T3_BASE =
+  "html{background:var(--background);color:var(--foreground);font-family:var(--font-sans);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;scrollbar-width:none}html::-webkit-scrollbar{display:none}body{margin:0}code,kbd,pre,samp{font-family:var(--font-mono)}:where(:focus-visible){outline:2px solid var(--ring)}:focus-visible{outline-width:2px!important;outline-offset:-2px!important}:where(img:not(a[href] img,button img)){cursor:zoom-in}";
+
+function t3Theme({ appearance, background }) {
+  return `:root{color-scheme:${appearance};--background:${background}}${T3_BASE}`;
+}
+
+function inT3(html, thread) {
+  return html.replace("<head>", `<head><style id="t3-theme">${t3Theme(thread)}</style>`);
 }
 
 let browser;
@@ -58,50 +67,60 @@ function look(page) {
   });
 }
 
+function keysOf(expect, seen) {
+  return Object.fromEntries(Object.keys(expect).map((key) => [key, seen[key]]));
+}
+
 // Inside T3's frame the system scheme does not follow T3, so each T3 case sets the opposite one.
 const cases = [
   {
-    name: "on a dark T3 thread",
-    t3: { appearance: "dark", background: "#0a0a0a" },
+    name: "turns dark on a dark T3 thread, sits on it flush left, and hides the switch",
+    thread: DARK_THREAD,
     system: "light",
     expect: { ...ON_THREAD, ...DARK },
   },
   {
-    name: "on a light T3 thread",
-    t3: { appearance: "light", background: "#fcfcfc" },
+    name: "turns light on a light T3 thread while the system is dark",
+    thread: LIGHT_THREAD,
     system: "dark",
     expect: { ...ON_THREAD, ...LIGHT },
   },
   {
-    name: "on a custom dark T3 theme written in oklch",
-    t3: { appearance: "dark", background: "oklch(0.25 0.02 260)" },
+    name: "turns dark on a custom T3 background written in oklch",
+    thread: { appearance: "dark", background: "oklch(0.25 0.02 260)" },
     system: "light",
     expect: { ...ON_THREAD, ...DARK },
   },
   {
-    name: "outside T3",
-    t3: null,
+    name: "outside T3 keeps its bone ground, the switch and the system scheme",
+    thread: null,
     system: "light",
     expect: { ground: BONE_GROUND, switchShown: true, overflow: 0, ...LIGHT },
   },
 ];
 
-function only(seen, expect) {
-  return Object.fromEntries(Object.keys(expect).map((key) => [key, seen[key]]));
-}
-
-for (const { name, t3, system, expect } of cases) {
+for (const { name, thread, system, expect } of cases) {
   test(`a Field Guide page ${name}`, async () => {
-    const page = await open(t3 ? inT3(template, t3) : template, { system });
-    assert.deepEqual(only(await look(page), expect), expect);
+    const page = await open(thread ? inT3(template, thread) : template, { system });
+    assert.deepEqual(keysOf(expect, await look(page)), expect);
   });
 }
 
-test("a Field Guide page follows T3 when the reader switches T3 to light", async () => {
-  const page = await open(inT3(template, { appearance: "dark", background: "#0a0a0a" }), { system: "dark" });
-  // T3 rewrites this style in place when its theme changes.
-  await page.evaluate(() => {
-    document.getElementById("t3-theme").textContent = ":root{color-scheme:light;--background:#fcfcfc}";
-  });
-  assert.deepEqual(only(await look(page), LIGHT), LIGHT);
+test("a Field Guide page turns light when the reader switches T3 to light", async () => {
+  const page = await open(inT3(template, DARK_THREAD), { system: "dark" });
+  await page.evaluate((css) => {
+    document.getElementById("t3-theme").textContent = css;
+  }, t3Theme(LIGHT_THREAD));
+  assert.deepEqual(keysOf(LIGHT, await look(page)), LIGHT);
+});
+
+test("a Field Guide page keeps its vertical section spacing in T3", async () => {
+  const spacing = async (html) =>
+    (await open(html, { system: "light" })).evaluate(() =>
+      [...document.querySelectorAll(".hero, .sec")].map((el) => {
+        const { paddingTop, paddingBottom } = getComputedStyle(el);
+        return `${el.className}: ${paddingTop} ${paddingBottom}`;
+      }),
+    );
+  assert.deepEqual(await spacing(inT3(template, DARK_THREAD)), await spacing(template));
 });

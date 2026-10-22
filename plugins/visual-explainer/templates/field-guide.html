@@ -9,7 +9,8 @@
 (function(){
   var r=document.documentElement;r.classList.add('js');
   // In T3 (references/t3.md) the page is dark when white text contrasts more than black on T3's background,
-  // which is WCAG luminance under .179. T3 rewrites #t3-theme when the reader switches its theme.
+  // which is WCAG luminance under .179. A colour the canvas cannot read leaves it white, so light.
+  // T3 rewrites #t3-theme when the reader switches its theme.
   var t3=document.getElementById('t3-theme');
   if(t3){
     r.classList.add('t3');
@@ -293,9 +294,10 @@ footer{padding:22px 0 40px;font-family:var(--mono);font-size:13px;color:var(--mu
 /* ---------- T3 VISUAL PAGE (references/t3.md): the thread is the ground, the left edge meets the reply text ---------- */
 .t3 body{background:none}
 .t3 .theme{display:none}
-.t3 .wrap{padding:0 12px 0 0}
+.t3 .wrap{padding-inline:0 12px}
 .t3 .topbar{padding-right:0;padding-top:0}
-.t3 .inv>.wrap,.t3 .cobalt>.wrap{padding:0 clamp(16px,4vw,32px)}
+.t3 .inv>.wrap,.t3 .cobalt>.wrap{padding-inline:clamp(16px,4vw,32px)}
+.t3 .plate{padding:clamp(16px,2.6vw,28px)}
 </style>
 </head>
 <body>
