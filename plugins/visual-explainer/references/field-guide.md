@@ -43,6 +43,7 @@ Serif italic marks only these: the tail of a headline (“…five gates. *Any �
 - `:root` holds the light tokens. `:root[data-theme=dark]` holds the dark tokens, and the same dark block repeats inside `@media (prefers-color-scheme:dark){:root:not([data-theme=light]){…}}`. Without JS, the page follows the system.
 - A fixed switch sits at the top right: two buttons, **Light** and **Dark**, with `aria-pressed`, a 2px `--fg` border, a `--surface` ground and a 3px hard shadow. The pressed button inverts (`--fg` ground, `--surface` text). Hide it in print and without JS.
 - Clicking sets `document.documentElement.dataset.theme` and stores it in `localStorage` (key `fg-theme`, inside `try/catch`, because `file://` pages can throw). A one-line script in `<head>` applies the stored choice before first paint. The switch reflects the system scheme until the reader chooses.
+- In T3 (`references/t3.md`), the page follows T3's background instead of the system scheme or a stored choice, and the switch is hidden.
 - What flips: the ground, surfaces, text and borders; the inverse field (ink band in light, bone band in dark, with a butter accent in light and a cobalt accent in dark); and the hero note's offset shadow (ink in light, cobalt in dark). What does not flip: the cobalt, tomato and butter fields.
 
 ## Page structure
@@ -83,7 +84,8 @@ Serif italic marks only these: the tail of a headline (“…five gates. *Any �
 ## Extra delivery checks
 
 ```
-□ light and dark both checked at 728px and 1280px; the switch works, persists, and follows the system before a choice
+□ outside T3: light and dark both checked at 728px and 1280px; the switch works, persists, and follows the system before a choice
+□ in T3: the page is light on a light T3 background and dark on a dark one (`html_preview` both appearances), with the switch hidden
 □ one full-width colour field per screen at most; tomato only for risk or failure
 □ no raw tomato or butter text on the ground; SVG colours come from tokens
 □ plate key steps through every stage; dimming is opaque; #gate=N works; everything shows without JS

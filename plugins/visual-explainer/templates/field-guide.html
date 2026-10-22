@@ -5,7 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Field Guide · 94% of reads never touch the database</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23f6d44c'/%3E%3Ctext x='32' y='48' font-family='Georgia' font-style='italic' font-size='44' text-anchor='middle' fill='%23121212'%3EF%3C/text%3E%3C/svg%3E">
-<script>(function(){var r=document.documentElement;r.classList.add('js');try{var t=localStorage.getItem('fg-theme');if(t==='light'||t==='dark')r.dataset.theme=t;}catch(e){}})();</script>
+<script>
+(function(){
+  var r=document.documentElement;r.classList.add('js');
+  // In T3 (references/t3.md) the page is dark when white text contrasts more than black on T3's background,
+  // which is WCAG luminance under .179. A colour the canvas cannot read leaves it white, so light.
+  // T3 rewrites #t3-theme when the reader switches its theme.
+  var t3=document.getElementById('t3-theme');
+  if(t3){
+    r.classList.add('t3');
+    var c=document.createElement('canvas').getContext('2d');
+    var pick=function(){
+      c.fillStyle='#fff';c.fillStyle=getComputedStyle(r).getPropertyValue('--background');c.fillRect(0,0,1,1);
+      var p=c.getImageData(0,0,1,1).data,w=[.2126,.7152,.0722],L=0;
+      for(var i=0;i<3;i++){var v=p[i]/255;L+=w[i]*(v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4));}
+      r.dataset.theme=L<.179?'dark':'light';
+    };
+    pick();new MutationObserver(pick).observe(t3,{childList:true,characterData:true,subtree:true});
+    return;
+  }
+  try{var t=localStorage.getItem('fg-theme');if(t==='light'||t==='dark')r.dataset.theme=t;}catch(e){}
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -98,7 +119,7 @@ h2{font-size:clamp(1.9rem,4.4vw,3.1rem);font-weight:700;max-width:21ch}
 figure{margin:0}
 figcaption{margin-top:24px;font-size:17px;max-width:62ch}
 figcaption strong{font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin-right:8px}
-.plate{background:var(--surface);border:3px solid var(--fg);padding:clamp(14px,2.6vw,28px);box-shadow:10px 10px 0 var(--shadow)}
+.plate{background:var(--surface);border:3px solid var(--fg);padding:clamp(16px,2.6vw,28px);box-shadow:10px 10px 0 var(--shadow)}
 .plate-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-bottom:10px;border-bottom:1.5px solid var(--fg);margin-bottom:14px}
 .plate-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
 .plate-grid>*{min-width:0}
@@ -269,6 +290,14 @@ footer{padding:22px 0 40px;font-family:var(--mono);font-size:13px;color:var(--mu
 }
 @media (prefers-reduced-motion:reduce){.flow{animation:none;display:none}body{transition:none}}
 @media print{.walk,.theme,.flow{display:none}.plate,.note::before{box-shadow:none}}
+
+/* ---------- T3 VISUAL PAGE (references/t3.md): the thread is the ground, the left edge meets the reply text ---------- */
+.t3{font-size:100%}
+.t3 body{background:none}
+.t3 .theme{display:none}
+.t3 .wrap{padding-inline:0 12px}
+.t3 .topbar{padding-right:0;padding-top:0}
+.t3 .inv>.wrap,.t3 .cobalt>.wrap{padding-inline:clamp(16px,4vw,32px)}
 </style>
 </head>
 <body>

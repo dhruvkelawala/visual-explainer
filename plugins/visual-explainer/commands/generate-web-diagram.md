@@ -1,6 +1,6 @@
 ---
 name: generate-web-diagram
-description: Generate a standalone HTML diagram and open it in the browser
+description: Generate a standalone HTML diagram and show it
 ---
 
 Load the visual-explainer skill and make a visual explanation of: $@
