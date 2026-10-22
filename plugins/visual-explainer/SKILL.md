@@ -1,6 +1,6 @@
 ---
 name: visual-explainer
-description: Generate self-contained HTML visual explanations for systems, code changes, plans, data, and technical concepts. Use for diagrams, architecture overviews, diff or plan reviews, project recaps, comparison tables, slide decks, animated explainers, narrated MP4 videos, and other visual explanations.
+description: Generate self-contained HTML visual explanations for systems, code changes, plans, data, and technical concepts. Use for diagrams, architecture overviews, diff or plan reviews, project recaps, comparison tables, teaching pages that build a topic from scratch, slide decks, animated explainers, narrated MP4 videos, and other visual explanations.
 license: MIT
 compatibility: Requires a browser to view generated HTML files. Optional surf-cli for AI image generation.
 metadata:
@@ -45,6 +45,7 @@ Shape the page to the content. These are starting points, not templates: merge, 
 | Page | Typical shape |
 |---|---|
 | Concept explainer | question → intuition picture → mechanism (stepper) → edge cases → what to remember |
+| Teaching page (a topic from scratch) | the one idea → 3–7 building blocks, each ending with "in our project" → assembly → cheat sheet → sources, fed by the cited notes `research` writes in the repo (`references/teaching.md`) |
 | Visual plan | hero figure → claims by behavior, with decisions where they change the build → shared → not changing (`references/plans.md`) |
 | Review or audit | verdict → evidence figures → risks → next steps |
 | Comparison | the difference drawn side by side → trade-offs → recommendation |
