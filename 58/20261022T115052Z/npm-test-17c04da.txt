@@ -1,0 +1,12 @@
+
+> visual-explainer@0.12.0 test
+> node --test test/*.test.mjs
+
+✔ a Field Guide page turns dark on a dark T3 thread, sits on it flush left, and hides the switch (560.980875ms)
+✔ a Field Guide page turns light on a light T3 thread while the system is dark (162.9085ms)
+✔ a Field Guide page turns dark on a custom T3 background written in oklch (171.524042ms)
+✔ a Field Guide page outside T3 paints its own ground, shows the switch and follows a dark system (163.070666ms)
+✔ a Field Guide page turns light when the reader switches T3 to light (167.702959ms)
+✔ a Field Guide page keeps the reference build's type scale and section spacing in T3 (335.618958ms)
+ℹ tests 6
+ℹ suites 0
