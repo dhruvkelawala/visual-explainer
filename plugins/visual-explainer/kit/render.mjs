@@ -17,8 +17,10 @@ import { hasPlan, renderPlan, renderPlanForHost } from "../plan/render.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
 
-// Each register's families, at the weights the kit uses.
+// Each register's families, at the weights the kit uses. Field Guide is this fork's default (references/field-guide.md).
+const DEFAULT_REGISTER = "field-guide";
 const FONTS = {
+  "field-guide": "family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600",
   instrument: "family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600",
   blueprint: "family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600",
   paper: "family=Newsreader:opsz,wght@6..72,400..600&family=Atkinson+Hyperlegible+Next:wght@400;600&family=Atkinson+Hyperlegible+Mono:wght@400;500;600",
@@ -51,8 +53,9 @@ export const reportLine = (r) => `Page: ${plural(r.figures, "figure")}${r.uncapt
  * Inlines the kit at its marker and expands the data tags, <ve-flow>, and <ve-ask>. A page with none returns unchanged, with `kit: false`.
  * `sendBack` marks a page Pi opens in Glimpse, so the reader's reply goes to the agent instead of being copied.
  * `root` is the repo a <ve-flow> model imports from; `models: false` refuses to run one (the MCP server, unless opted in).
+ * `t3` renders a T3 visual page (references/t3.md): no reader replies, whose fixed bar and vh-sized dialog T3's frame rejects.
  */
-export function renderPage(source, { sendBack = false, root = process.cwd(), models = true } = {}) {
+export function renderPage(source, { sendBack = false, root = process.cwd(), models = true, t3 = false } = {}) {
   const errors = [], warnings = [];
   const doc = parseHtml(source);
   const links = find(doc, (n) => n.name === "link" && "data-ve-kit" in n.attrs);
@@ -65,7 +68,8 @@ export function renderPage(source, { sendBack = false, root = process.cwd(), mod
   const where = (n) => `line ${lineOf(n.pos)} <${n.name}${n.attrs.id ? `#${n.attrs.id}` : ""}>`;
   if (!links.length) errors.push(`${where(tags[0])}: tags need the kit; add <link rel="stylesheet" href="kit.css" data-ve-kit> to <head>`);
   if (links.length > 1) errors.push(`${links.length} <link data-ve-kit> elements; keep one in <head>`);
-  const register = find(doc, (n) => n.name === "html")[0]?.attrs["data-register"] || "instrument";
+  const htmlTag = find(doc, (n) => n.name === "html")[0];
+  const register = htmlTag?.attrs["data-register"] || DEFAULT_REGISTER;
   if (!FONTS[register]) errors.push(`data-register="${register}" is not a register; use ${Object.keys(FONTS).join(", ")}`);
   const body = find(doc, (n) => n.name === "body")[0];
   if (!body) errors.push("the page has no <body>");
@@ -76,6 +80,8 @@ export function renderPage(source, { sendBack = false, root = process.cwd(), mod
   };
   for (const n of find(doc, (x) => "data-if" in x.attrs)) errors.push(`${where(n)}: data-if belongs to plan pages`);
   // the reader's reply is collected inside <main>, so an ask anywhere else would be answered and never reach the agent
+  if (t3) for (const a of asks) errors.push(`${where(a)}: a T3 visual page has no reader replies, so <ve-ask> cannot be answered; ask in the reply instead`);
+  if (t3 && register !== "field-guide") warnings.push(`data-register="${register}" follows only the system scheme, not T3's; T3 pages use field-guide`);
   if (asks.length) {
     const main = find(doc, (n) => n.name === "main")[0];
     const inMain = new Set(main ? find(main, (n) => n.name === "ve-ask") : []);
@@ -153,8 +159,11 @@ export function renderPage(source, { sendBack = false, root = process.cwd(), mod
   if (errors.length) return { html: source, kit: true, errors, warnings };
 
   // a page with <ve-ask> also gets its styles and its part of the reply; a page with Mermaid gets the diagram colors
-  const css = ["kit.css", ...(asks.length ? ["ask.css"] : []), ...(mermaids.length ? ["mermaid.css"] : [])].map((f) => readFileSync(join(here, f), "utf8")).join("");
-  const js = ["reply.js", ...(asks.length ? ["ask.js"] : []), "kit.js"].map((f) => readFileSync(join(here, f), "utf8")).join("\n").replace(/<\/script/gi, "<\\/script");
+  // a page without data-register gets the default written on it, so the kit's register rules match it
+  if (htmlTag && !htmlTag.attrs["data-register"]) htmlTag.openRaw = htmlTag.openRaw.replace(/\s*>$/, ` data-register="${register}">`);
+  const fieldGuide = register === "field-guide";
+  const css = ["kit.css", ...(fieldGuide ? ["field-guide.css"] : []), ...(asks.length ? ["ask.css"] : []), ...(mermaids.length ? ["mermaid.css"] : [])].map((f) => readFileSync(join(here, f), "utf8")).join("");
+  const js = [...(t3 ? [] : ["reply.js"]), ...(asks.length ? ["ask.js"] : []), "kit.js"].map((f) => readFileSync(join(here, f), "utf8")).join("\n").replace(/<\/script/gi, "<\\/script");
   const script = `<script data-ve-kit${sendBack ? " data-send-back" : ""}>\n${js}</script>`;
   // without a charset, Firefox and Safari garble · and — (prepareRenderedHtml adds the viewport)
   const charset = find(doc, (n) => n.name === "meta" && ("charset" in n.attrs || /^content-type$/i.test(n.attrs["http-equiv"] ?? ""))).length ? "" : '<meta charset="utf-8">\n';
@@ -162,7 +171,7 @@ export function renderPage(source, { sendBack = false, root = process.cwd(), mod
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?${esc(FONTS[register])}&amp;display=swap" rel="stylesheet">
 <style data-ve-kit>
-${css}</style>`;
+${css}</style>${fieldGuide ? `\n<script data-ve-theme>\n${readFileSync(join(here, "theme.js"), "utf8").replace(/<\/script/gi, "<\\/script")}</script>` : ""}`;
   // The shared defs go first in <body>, each only if the page has no element with its id (the template has all four, so it opens raw).
   const defs = readFileSync(join(here, "defs.svg"), "utf8").trimEnd().split("\n").filter((line) => {
     const id = line.match(/^\s*<\w+ id="([^"]+)"/)?.[1];
@@ -233,7 +242,7 @@ async function main() {
   const value = (name) => { const i = argv.indexOf(name); return i >= 0 ? argv[i + 1] : undefined; };
   const input = argv.find((a, i) => !a.startsWith("-") && !["-o", "--root"].includes(argv[i - 1]));
   if (!input) {
-    console.error("usage: node render.mjs page.src.html [-o page.html] [--root <repo>] [--lint] [--open] [--no-check]");
+    console.error("usage: node render.mjs page.src.html [-o page.html] [--root <repo>] [--lint] [--open] [--no-check] [--t3]");
     process.exit(2);
   }
   const output = value("-o") ?? (/\.src\.html?$/i.test(input) ? input.replace(/\.src(\.html?)$/i, "$1") : null);
@@ -243,7 +252,7 @@ async function main() {
   }
   const source = readFileSync(input, "utf8");
   const root = value("--root") ?? process.cwd();
-  const result = hasPlan(source) ? renderPlan(source, { root }) : renderPage(source, { root });
+  const result = hasPlan(source) ? renderPlan(source, { root }) : renderPage(source, { root, t3: flag("--t3") });
   const summary = result.summary ?? (result.kit ? "kit inlined" : "no kit marker; written as given");
   for (const w of result.warnings) console.log(`  ⚠ ${w}`);
   for (const e of result.errors) console.log(`  ✗ ${e}`);

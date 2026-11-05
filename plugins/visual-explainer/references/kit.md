@@ -6,7 +6,7 @@ The kit is the shared CSS, fonts, SVG defs, and script of every page. You write 
 
 ```html
 <!doctype html>
-<html lang="en" data-register="blueprint">
+<html lang="en" data-register="field-guide">
 <head>
 <title>94% of reads never touch the database</title>
 <link rel="stylesheet" href="kit.css" data-ve-kit>
@@ -32,9 +32,9 @@ The kit is the shared CSS, fonts, SVG defs, and script of every page. You write 
 </html>
 ```
 
-The renderer adds the charset, viewport, favicon, fonts, kit CSS and script, and the SVG defs (`#ve-ah` arrowhead, `#ve-node` fill, `#ve-w-on` / `#ve-w-off` waffle cells).
+The renderer adds the charset, viewport, favicon, fonts, kit CSS and script (on a Field Guide page also its CSS and the light/dark script), and the SVG defs (`#ve-ah` arrowhead, `#ve-node` fill, `#ve-w-on` / `#ve-w-off` waffle cells).
 
-**Registers:** `data-register="instrument"` (default), `blueprint`, `paper`, or `editorial` (`style-guide.md`). Use the tokens as `var(--accent)`, `var(--s-4)`; a page's own `:root { --accent: … }` wins over the kit.
+**Registers:** `data-register="field-guide"` (the default when it is left out; its parts are in `field-guide.md`), `instrument`, `paper`, or `editorial` (`style-guide.md`). The kit still accepts `blueprint`, but this fork never uses it. Use the tokens as `var(--accent)`, `var(--s-4)`; a page's own `:root { --accent: … }` wins over the kit.
 
 The kit already styles plain HTML, so a page adds none of it: a section's paragraphs and lists at 65ch, `<pre>` code blocks, bare `<ul>`/`<ol>`, and the gaps between a section's blocks. A page's own rule always wins.
 

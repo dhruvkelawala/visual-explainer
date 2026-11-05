@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en" data-register="field-guide">
+<head>
+<title>94% of reads never touch Postgres</title>
+<link rel="stylesheet" href="kit.css" data-ve-kit>
+<style>
+.hero { display: grid; gap: var(--s-6); align-items: end; }
+@media (min-width: 54rem) { .hero { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); } }
+</style>
+</head>
+<body>
+<nav class="ve-toc" aria-label="Sections"><div><a href="#read">Plate I</a><a href="#numbers">Measurements</a><a href="#species">Plate II</a><a href="#hazards">Hazards</a><a href="#remember">Remember</a></div><span class="pos"></span></nav>
+<main>
+  <header>
+    <p class="eyebrow">Field Guide · cache-aside on dashboard-api</p>
+    <div class="hero">
+      <h1><span class="num">94<span class="unit">%</span></span> of reads never touch <em>Postgres.</em></h1>
+      <div class="fg-note">
+        <p class="ve-label"><span>Field note</span><span>Obs. · 7 days</span></p>
+        <p class="lead">We put <b>Redis in front of Postgres.</b> Most dashboard reads now return in 3&nbsp;ms, and p95 fell from 840&nbsp;ms to <b>140&nbsp;ms.</b></p>
+        <p class="meta">dashboard-api · Sep 2026 · 7-day window</p>
+        <span class="fg-stamp">■ Two-way door · flag: cache.enabled</span>
+      </div>
+    </div>
+  </header>
+
+  <section id="read">
+    <div class="sec-head"><div><span class="fg-no">01</span><p class="ve-label caps">Plate I · Anatomy of a read</p></div><h2>Most reads stop at Redis. <em>Only a miss reaches Postgres.</em></h2></div>
+    <figure class="ve-steps">
+      <ve-flow label="The browser asks the API, the API checks Redis, and only a miss reads Postgres and writes the value back.">
+        <ve-node id="browser" at="1 1" sub="GET /dashboard" data-s="1" data-ref="browser">Browser</ve-node>
+        <ve-node id="api" at="2 1" sub="dash:{user}" data-s="2" data-ref="api">API</ve-node>
+        <ve-node id="redis" at="3 1" shape="db" sub="hit · 3 ms" key data-s="3" data-ref="redis">Redis</ve-node>
+        <ve-node id="pg" at="2 2" shape="db" sub="miss · 120 ms" data-s="4" data-ref="pg">Postgres</ve-node>
+        <ve-edge from="browser" to="api" label="asks" data-s="1"/>
+        <ve-edge from="api" to="redis" label="checks" hot data-s="2 3"/>
+        <ve-edge from="api" to="pg" label="on a miss" async data-s="4"/>
+      </ve-flow>
+      <div class="ve-player">
+        <ol class="ve-cap">
+          <li data-n="1/4">The browser asks for <code>GET /dashboard</code>. Nothing about the request changes with the cache.</li>
+          <li data-n="2/4">The API builds the key <code>dash:{user}</code> and asks Redis before it asks Postgres.</li>
+          <li data-n="3/4">On a hit, Redis answers in 3&nbsp;ms. Postgres is never asked.</li>
+          <li data-n="4/4">On a miss, Postgres answers in 120&nbsp;ms and the value is cached for 5&nbsp;minutes.</li>
+        </ol>
+        <button data-go="-1" aria-label="Previous step">‹</button><button data-play>Play</button><input type="range" aria-label="Step"><button data-go="1" aria-label="Next step">›</button>
+      </div>
+      <figcaption><span class="fig-n">Fig. 1</span>Every read asks <span class="ve-ref" data-ref="redis" tabindex="0">Redis</span> first. A miss costs one 120&nbsp;ms trip to <span class="ve-ref" data-ref="pg" tabindex="0">Postgres</span>.</figcaption>
+    </figure>
+  </section>
+
+  <section class="fg-inv" id="numbers">
+    <div class="sec-head"><div><span class="fg-no">02</span><p class="ve-label caps">Measurements · 7 days</p></div><h2>Pages got 6× faster, and <em>Postgres went quiet.</em></h2></div>
+    <div class="kpis">
+      <div class="kpi"><span class="ve-label">Hit rate</span><span class="val"><span data-count="94">94</span><span class="unit">%</span></span><ve-waffle value="94" note="6 misses" label="94 of 100 reads are answered by Redis"></ve-waffle></div>
+      <div class="kpi"><span class="ve-label">p95 page load</span><span class="val"><span data-count="140">140</span><span class="unit">ms</span></span><ve-bars unit="ms" max="840" label="p95 fell from 840 ms before the cache to 140 ms after"><ve-bar value="840">before</ve-bar><ve-bar value="140" hot>after</ve-bar></ve-bars></div>
+      <div class="kpi"><span class="ve-label">Postgres reads a second</span><span class="val"><span data-count="340">340</span><span class="unit">/s</span></span><ve-bars unit="k" max="5.6" label="Postgres reads fell from 5,600 a second to 340"><ve-bar value="5.6">before</ve-bar><ve-bar value="0.34" hot>after</ve-bar></ve-bars></div>
+    </div>
+  </section>
+
+  <section id="species">
+    <div class="sec-head"><div><span class="fg-no">03</span><p class="ve-label caps">Plate II · Four species of read</p></div><h2>Most reads are hits. <em>Misses refill the cache.</em></h2></div>
+    <figure>
+      <div class="cases">
+        <article class="case" data-st="ok">
+          <div class="fg-top" data-field="cobalt"><span>Specimen No. 1</span><span class="chip ok">Hit</span></div>
+          <h3>The <em>Common</em> Hit</h3>
+          <svg class="ve-mini" viewBox="0 0 240 128" aria-label="The API asks Redis and gets the value back; Postgres is not asked">
+            <path class="ve-e is-st" d="M78 26H146"/><path class="ve-e is-off" d="M78 102H146"/>
+            <text class="ve-el" x="112" y="16">hit</text>
+            <g class="ve-n"><rect class="sh" x="8" y="8" width="70" height="112"/><text x="43" y="64">API</text></g>
+            <g class="ve-n is-st"><rect class="sh" x="150" y="8" width="82" height="36"/><text x="191" y="26">Redis</text></g>
+            <g class="ve-n is-off"><rect class="sh" x="150" y="84" width="82" height="36"/><text x="191" y="102">Postgres</text></g>
+          </svg>
+          <dl><dt>Field mark</dt><dd>Answered in about 3&nbsp;ms.</dd><dt>Habitat</dt><dd>The key is warm in Redis.</dd><dt>Cost</dt><dd>3&nbsp;ms. <b>Postgres stays idle.</b></dd></dl>
+        </article>
+        <article class="case" data-st="warn">
+          <div class="fg-top" data-field="butter"><span>Specimen No. 2</span><span class="chip warn">Miss</span></div>
+          <h3>The <em>Cold</em> Miss</h3>
+          <svg class="ve-mini" viewBox="0 0 240 128" aria-label="Redis has no key, so the API asks Postgres, which answers in 120 ms, and writes the value back">
+            <path class="ve-e is-off" d="M78 26H146"/><path class="ve-e is-st" d="M78 102H146"/><path class="ve-e is-st" d="M191 82V48"/>
+            <text class="ve-el" x="112" y="16">miss</text><text class="ve-el" x="112" y="92">120 ms</text>
+            <g class="ve-n"><rect class="sh" x="8" y="8" width="70" height="112"/><text x="43" y="64">API</text></g>
+            <g class="ve-n is-off"><rect class="sh" x="150" y="8" width="82" height="36"/><text x="191" y="26">Redis</text></g>
+            <g class="ve-n is-st"><rect class="sh" x="150" y="84" width="82" height="36"/><text x="191" y="102">Postgres</text></g>
+          </svg>
+          <dl><dt>Field mark</dt><dd>Answered in 120&nbsp;ms.</dd><dt>Habitat</dt><dd>The first read, or any read after the 5-minute TTL.</dd><dt>Cost</dt><dd>120&nbsp;ms, once per key.</dd></dl>
+        </article>
+        <article class="case" data-st="ok">
+          <div class="fg-top" data-field="ink"><span>Specimen No. 3</span><span class="chip ok">Write</span></div>
+          <h3>The <em>Edit</em></h3>
+          <svg class="ve-mini" viewBox="0 0 240 128" aria-label="A user edits a row: the API updates Postgres and deletes the key in Redis">
+            <path class="ve-e is-async" d="M78 26H146"/><path class="ve-e is-st" d="M78 102H146"/>
+            <text class="ve-el" x="112" y="16">delete</text><text class="ve-el" x="112" y="92">update</text>
+            <g class="ve-n"><rect class="sh" x="8" y="8" width="70" height="112"/><text x="43" y="64">API</text></g>
+            <g class="ve-n"><rect class="sh" x="150" y="8" width="82" height="36"/><text x="191" y="26">Redis</text></g>
+            <g class="ve-n is-st"><rect class="sh" x="150" y="84" width="82" height="36"/><text x="191" y="102">Postgres</text></g>
+          </svg>
+          <dl><dt>Field mark</dt><dd>A user edits a row.</dd><dt>Habitat</dt><dd>Any write through the API.</dd><dt>Cost</dt><dd>One extra miss. <b>Never a stale row for long.</b></dd></dl>
+        </article>
+        <article class="case" data-st="risk">
+          <div class="fg-top" data-field="tomato"><span>Specimen No. 4</span><span class="chip risk">Open risk</span></div>
+          <h3>The <em>Stampede</em></h3>
+          <svg class="ve-mini" viewBox="0 0 240 128" aria-label="After a cold start Redis is empty, so many reads query Postgres at once">
+            <path class="ve-e is-off" d="M78 26H146"/><path class="ve-e is-st" d="M78 92H146"/><path class="ve-e is-st" d="M78 104H146"/><path class="ve-e is-st" d="M78 116H146"/>
+            <text class="ve-el" x="112" y="16">all miss</text><text class="ve-el" x="112" y="78">at once</text>
+            <g class="ve-n"><rect class="sh" x="8" y="8" width="70" height="112"/><text x="43" y="64">API</text></g>
+            <g class="ve-n is-off"><rect class="sh" x="150" y="8" width="82" height="36"/><text x="191" y="26">Redis</text></g>
+            <g class="ve-n is-st"><rect class="sh" x="150" y="84" width="82" height="36"/><text x="191" y="102">Postgres</text></g>
+          </svg>
+          <dl><dt>Field mark</dt><dd>Many misses at the same moment.</dd><dt>Habitat</dt><dd>Right after a deploy, when every key is cold.</dd><dt>Cost</dt><dd>Many 120&nbsp;ms queries at once. <b>Not handled yet.</b></dd></dl>
+        </article>
+      </div>
+      <figcaption><span class="fig-n">Fig. 2</span>Hits are the common case. Misses and edits refill the cache. The stampede is the open risk.</figcaption>
+    </figure>
+  </section>
+
+  <section id="hazards">
+    <div class="sec-head"><div><span class="fg-no">04</span><p class="ve-label caps">Hazards · where to look first</p></div><h2>The cold start is the weak spot. <em>Start there.</em></h2></div>
+    <ul class="fg-hz">
+      <li><span class="fg-tag risk">■ Risk</span><div><h3>Cold start can stampede Postgres</h3><p>After a deploy every key is cold, so every read misses at once. Request coalescing sends one query per key while the other reads wait for it.</p></div></li>
+      <li><span class="fg-tag check">○ Check</span><div><h3>A missed delete serves stale data for up to 5 minutes</h3><p>If a write path forgets to delete its key, readers see the old row. The 5-minute TTL bounds how long.</p></div></li>
+      <li><span class="fg-tag">▲ Later</span><div><h3>Hit rate is a 7-day average</h3><p>One busy endpoint can hide a cold one. Measure the hit rate per endpoint.</p></div></li>
+    </ul>
+    <div class="fg-switch"><b>Kill switch</b><p><code>cache.enabled=false</code> sends every read to Postgres. p95 returns to about 840&nbsp;ms.</p></div>
+  </section>
+
+  <section class="fg-cobalt" id="remember">
+    <div class="sec-head"><div><span class="fg-no">05</span><p class="ve-label caps">What to remember</p></div><h2>Read from memory, <em>write to the source.</em></h2></div>
+    <ol class="fg-takes">
+      <li><span class="n">One.</span><h3>Cache what repeats.</h3><p>Dashboard reads repeat, so 94 of every 100 come from Redis in about 3&nbsp;ms.</p></li>
+      <li><span class="n">Two.</span><h3>Delete on write.</h3><p>The API deletes the key after a write. The next read refills it from Postgres.</p></li>
+      <li><span class="n">Three.</span><h3>The TTL is the safety net.</h3><p>If a delete is missed, the 5-minute TTL caps how long stale data lives.</p></li>
+    </ol>
+  </section>
+
+  <section class="sources" aria-label="Sources"><p class="ve-label caps">Sources</p><p><code>dashboard-api/src/cache/dashboard.ts</code> · Grafana, dashboard-api p95, Sep 2026</p></section>
+</main>
+</body>
+</html>

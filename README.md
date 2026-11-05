@@ -18,6 +18,27 @@ Ask your agent to explain a system architecture, review a diff, or compare requi
 
 https://github.com/user-attachments/assets/55ebc81b-8732-40f6-a4b1-7c3781aa96ec
 
+## This fork
+
+This is a fork of [nicobailon/visual-explainer](https://github.com/nicobailon/visual-explainer), last synced with upstream v0.15.0. It adds three things:
+
+- **Field Guide is the default look.** Pages have a bone ground, cobalt, tomato and butter colour fields, poster-scale numbers, numbered plates and specimen cards, in light and dark with a switch. Field Guide is a kit register (`data-register="field-guide"`), so upstream's tags, render checks and reader replies all work with it. It replaces the Blueprint register. `references/field-guide.md` lists its parts, and `templates/field-guide.src.html` uses all of them.
+- **Pages show inside T3 Code.** When the `html_preview` and `html_render` tools are there, the agent renders the page with `--t3` and shows it in the thread instead of opening a browser. The page follows T3's light or dark theme. See `references/t3.md`.
+- **Teaching pages.** A page that builds a topic from scratch in 3 to 7 blocks, each tied back to your project. See `references/teaching.md`.
+
+Everything else is upstream's, and the rest of this README is upstream's too. To get these changes, install from this fork instead of upstream:
+
+```shell
+# Claude Code
+/plugin marketplace add dhruvkelawala/visual-explainer
+/plugin install visual-explainer@visual-explainer-marketplace
+
+# Pi
+pi install git:github.com/dhruvkelawala/visual-explainer
+```
+
+For any other agent, clone this fork and link `plugins/visual-explainer/` into the agent's skills folder. Run `npm install` once in the clone, so the renderer can check pages in a browser. [`FORK.md`](FORK.md) lists every changed file and the steps to sync with upstream.
+
 ## Why
 
 Every coding agent defaults to ASCII art when you ask for a diagram. Box-drawing characters, monospace alignment hacks, text arrows. It works for trivial cases, but anything beyond a 3-box flowchart turns into an unreadable mess.
@@ -516,11 +537,16 @@ plugins/
     ├── extension.ts       ← Pi native tool
     ├── commands/          ← slash commands
     ├── kit/               ← shared page CSS and script, renderer, page check, vendored Pele for Mermaid
+    │   ├── field-guide.css (fork: the Field Guide register, its parts, and the T3 block)
+    │   └── theme.js       (fork: light/dark switch, and T3's theme)
     ├── mcp/               ← local stdio MCP server
     ├── pptx/              ← best-effort static PPTX exporter
     ├── video/             ← MP4 renderer for video decks
     ├── references/        ← read on demand
-    │   ├── style-guide.md (four registers, layout, figure rules, topic motif, your own CSS)
+    │   ├── style-guide.md (registers, layout, figure rules, topic motif, your own CSS)
+    │   ├── field-guide.md (fork: the house register and its parts)
+    │   ├── t3.md          (fork: showing a page inside T3 Code)
+    │   ├── teaching.md    (fork: the teaching page shape)
     │   ├── kit.md         (kit marker, parts, data tags, <ve-flow>)
     │   ├── diagrams.md    (hand-drawn SVG kit, dimensions, callouts, linked highlighting)
     │   ├── motion.md      (stepper, scene player, replay, live figures, three.js)
@@ -530,12 +556,13 @@ plugins/
     │   └── themes.md      (11 palettes + runtime theme/font picker)
     └── templates/
         ├── page.html      (figure-first reference page, Instrument register)
+        ├── field-guide.src.html (fork: reference source, Field Guide register)
         └── slide-deck.html (slide engine + reference deck)
 ```
 
 **Output:** `~/.agent/diagrams/filename.html` by default (native Pi can configure the directory above) → opens in browser. The agent writes a short source, `filename.src.html`, that links the shared kit; the renderer builds the page from it and keeps it for small revisions. When Chrome and `playwright-core` are available, the renderer also checks the page in a browser and writes `filename.sheet.png`, a contact sheet of the first screen, the figures, and every step, which the agent looks at instead of taking its own screenshots. On request, the agent also writes `filename.md` as an AI-readable companion; it asks before replacing one. In Pi, agents can offer `visual_explainer` `prepare` after a substantial plan, architecture, diff, or implementation, then `render` to write and open the page. MCP hosts use the `visual-explainer-mcp` stdio server, whose render tool defaults to `open: false`.
 
-Pages are figure-first: the first screen shows the answer as a picture and one sentence. Each page uses one of four registers (Instrument for reviews and metrics, Blueprint for architecture, Paper for concepts, Editorial for recaps and decks), each with fixed fonts, a contrast-checked palette, and one shared spacing and type scale. Terms in the text and parts of the figure light up together on hover. Diagrams are hand-drawn inline SVG, so they match the page and can step through a process. Mermaid is used only when you ask for it. Tables carry status chips, metrics get bars and sparklines, and prose follows a Simplified Technical English style.
+Pages are figure-first: the first screen shows the answer as a picture and one sentence. In this fork every page uses the Field Guide register unless you name another: Instrument for reviews and metrics, Paper for concepts, or Editorial for recaps and decks. Each register has fixed fonts, a contrast-checked palette, and one shared spacing and type scale. Terms in the text and parts of the figure light up together on hover. Diagrams are hand-drawn inline SVG, so they match the page and can step through a process. Mermaid is used only when you ask for it. Tables carry status chips, metrics get bars and sparklines, and prose follows a Simplified Technical English style.
 
 ## Limitations
 
