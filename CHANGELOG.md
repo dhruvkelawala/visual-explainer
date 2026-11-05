@@ -1,19 +1,99 @@
 # Changelog
 
-## [Unreleased]
+## [0.15.0] - 2026-11-04
+
+### Highlights
+- State machines drawn from your own code. Point a page at a reducer or transition function and it walks every state the code can reach: states you forgot to draw, events that never fire, dead ends, and broken rules you can replay step by step. A new `/state-machine` command does the whole job.
+- Questions you skip stay skipped. A suggested answer no longer reaches the agent as your choice unless you pick it.
+- Pages read well without any styling of their own, and long pages get a section menu that stays at the top.
+- In Pi, you choose where pages are saved, including a folder inside each project.
+- The Pi extension now loads in Pi builds that ship as a single Bun binary, such as Pi-Bolt.
+
 ### Added
-- `/generate-video` makes a narrated MP4. The agent writes a video deck, an HTML file whose scenes carry their narration. `visual-explainer-video` then records it at 1080p on a virtual clock, so motion never stutters and each sentence's picture appears with its voice. Narration uses clips from ElevenLabs, Seed Audio, OpenAI, or xAI when a key is set. Without a key, the video is silent with captions. `--stills` saves one picture per scene to check before rendering. The same command can record a walkthrough of a live web app. It needs ffmpeg and the `playwright-core` package, which is installed separately so everyone else's install stays small.
-- `/generate-visual-plan` makes a plan you answer in the page instead of a page you only read. It opens on the change as a drawing whose numbered parts match a short tree of claims. You pick options for the decisions the agent cannot make alone, mark its guesses right or wrong, and comment on any words you select. Then you approve or request changes and paste one response back. Changing an option redraws the figure and updates the file count. Keyboard shortcuts and saved answers make long plans quick to get through.
-- After the build, the same plan becomes a receipt: each claim shows whether it was built, changed, or dropped, next to the check that proves it.
-- Plans are written with a few short tags and rendered by `plan/render.mjs`, which has no dependencies. It reads cited code from your repository, stops on file paths and line numbers that do not exist, and adds the page's styles and script, so agents write about a quarter of what a hand-built plan page needs. Diagrams are boxes on a grid with arrows between them (`<ve-flow>`), laid out by the renderer, so agents no longer place SVG coordinates by hand. The Pi `visual_explainer` tool and the MCP render tool render plan tags too.
-- In Pi, a plan opened in Glimpse sends your response straight into the chat when you press Send to agent. No copy and paste.
+- Pages read well without any page CSS. Paragraphs and lists keep a comfortable line length, code blocks get a framed, scrollable style, plain lists get proper indents, and the blocks of a section get even spacing, so a figure's caption no longer sits on the paragraph after it.
+- A section menu for long pages. One `<nav>` line gives a bar that stays at the top, scrolls sideways on a phone, and marks the section you are reading.
+- Rendering a page flags drawing labels that have no color, which show as black text on a dark background.
+- State machines drawn from the code itself. Point a page at the reducer or transition function in your repo, and the page walks every state the code can reach. It shows the states you forgot to draw, the events that never fire, the dead ends, and each rule the code breaks as the shortest path there, which you can replay step by step. A machine too big to place by hand is laid out for you, and a machine with independent parts, like playback and volume, draws each part in its own box. A new `/state-machine` command runs the whole workflow, from finding the code to a test you can keep for each broken rule. The MCP server runs your code this way only when it starts with `VISUAL_EXPLAINER_RUN_MODELS=1`. Inspired by the `/statechart` skill in [cursor/plugins](https://github.com/cursor/plugins/tree/main/pstack/skills/statechart) (pstack), which walks a machine with TLA+; this kit walks the code directly and needs nothing installed.
+- In Pi, choose where pages are saved with a `visualExplainer.outputDir` setting, in your own settings or a project's. Set it to `"project"` to keep each repository's pages in its own `.agent/diagrams/`, or give any path. Thanks to [@IdrisGit](https://github.com/IdrisGit) for #128.
 
 ### Changed
-- `/plan-review` writes its review as a plan page: each finding is a claim with evidence from the code and a suggested fix you accept or reject, and your answers come back as one response.
+- Diff reviews and comparisons walk a state machine read from the code on each side, so they show a rule a change newly breaks or a state it makes unreachable.
+
+### Fixed
+- Sending a reply no longer answers the questions you left alone. A question with a suggested answer used to go into the reply as that answer, marked "(default)", so an agent could read an untouched "Approve" as approval and start work. It now goes in as "no answer" until you pick an option. Thanks to [@IdrisGit](https://github.com/IdrisGit) for #129 and [@mplibunao](https://github.com/mplibunao) for reporting #127.
+- The Pi extension loads in a Pi built as a single Bun binary, such as Pi-Bolt. It used to stop Pi from starting with `ENOENT: no such file or directory, lstat '/$bunfs/root/pi'`. Thanks to [@crisboarna](https://github.com/crisboarna) for #126.
+- A question whose suggested answer was written on the question instead of on the option showed nothing pre-selected and gave no warning. Rendering now stops with an error that shows where it belongs.
+- Values that change during a step-through, like a counter, showed as black, unreadable text in dark mode unless the page styled them itself.
+- An arrow's label no longer crosses the arrow beside it; the drawing widens to hold it.
+
+## [0.14.0] - 2026-10-18
+
+### Highlights
+- Pages check themselves. Every render opens the page in a browser, lists real layout problems like overlapping text, labels a line runs through, or text too small to read on a phone, and gives the agent one contact sheet to look at. Agents no longer write their own browser scripts, and a page takes about 23% fewer turns.
+- Explainers move when motion helps. A process, a flow, or a change of state gets a step-through or a replay without you asking for it.
+- Mermaid works offline and matches the page. A diagram written in Mermaid is drawn when the page is built, in the page's colors and fonts, with its own phone layout and nothing to load.
+- Less to read. An agent reads about 16% less guidance for a page without motion, and the main skill file is about 15% shorter.
+
+### Added
+- Rendering a page now looks at it in a browser when Chrome and `playwright-core` are available. It reports script errors, sideways scrolling, labels under 12 px, text that overlaps other text or runs past its drawing, labels a border or line runs through, and headings that sit on the figure below, at every step of a step-through too. It also saves a contact sheet with the first screen, each figure, and each step. Pi and MCP show the sheet to the agent; elsewhere the render prints its path. Without a browser, or when a page is slow or offline, the check is skipped with one line and the render still succeeds.
+- Kit classes for a dashed boundary, queue and worker slots, chart axes, and tables, which pages used to style by hand.
+
+### Changed
+- Explainers animate wherever motion helps the reader understand a process, a flow, or a change of state, without being asked. Step-throughs, replays, flow dots, and live figures are the default there; a slide deck, a video, and PPTX still need a request.
+- Agents read about 16% less for a page without motion, and no longer open the kit's source to look things up. Step-throughs, replays, live figures, and 3D have their own guide that agents read only when a figure moves.
+- The main skill file is about 15% shorter. Images, Mermaid, PPTX, and the older recipes moved to the guides that need them, and checks the renderer now does left the delivery checklist.
+- Mermaid diagrams are drawn when the page is built, by [Pele](https://github.com/obsidianmd/pele) from Obsidian, instead of by Mermaid.js from a CDN when the page opens. The diagram works offline, follows theme switches, gets its own phone layout, and is checked like any other figure. A Mermaid syntax error or a missing `aria-label` stops the render and names the line. Pele ships inside the skill, so there is nothing to install. Mermaid is still used only when you ask for it; hand-drawn figures stay the default.
+- Wide drawings keep their labels readable on a phone without the agent working out the scale. Every drawing gets `role="img"`, and a drawing without an `aria-label` stops the render.
+
+### Fixed
+- A section that opens with a small label above its heading no longer sits flush on the figure below.
+- Running `kit/render.mjs` or `plan/render.mjs` through a symlinked skill folder no longer exits without writing anything.
+
+### Removed
+- `kit/check.mjs`. Rendering a page runs the same checks and more.
+
+## [0.13.0] - 2026-10-17
+
+### Highlights
+- Talk back to any page. Select words or click part of a diagram to comment or ask, then send one reply. In Pi it goes straight into the chat; elsewhere it is copied for you to paste.
+- Plans you answer in the page. `/generate-visual-plan` draws the change, lets you pick options and mark the agent's guesses, and sends back one response. After the build, the same page shows what was built.
+- Narrated videos. `/generate-video` turns an explainer into a 1080p MP4 with voice-over, or records a walkthrough of a live web app.
+- Animated state machines. An explainer about a job queue, a workflow, or anything else with states can replay it one event at a time: the route each event takes lights up, a dot travels along it, queues fill and drain, and each step's caption says why it happened. Inspired by the animated state-machine diagrams in [hapsland](https://github.com/dearlordylord/hapsland) by Igor Loskutov ([@dearlordylord](https://github.com/dearlordylord)).
+- About 60% fewer tokens. An agent reads about 60% less guidance for a diagram and writes about 60% less per page, the always-on tool descriptions in Pi and MCP are shorter, and revisions are small edits instead of rewrites.
+
+### Added
+- `/generate-video` makes a narrated MP4. The agent writes a video deck whose scenes carry their narration, and `visual-explainer-video` records it at 1080p on a virtual clock, so motion never stutters and each picture appears with its sentence. Narration comes from ElevenLabs, Seed Audio, OpenAI, or xAI when a key is set; without one, the video is silent with captions. `--stills` saves one picture per scene to check first. The same command can record a walkthrough of a live web app. It needs ffmpeg and `playwright-core`, which you install separately so everyone else's install stays small.
+- `/generate-visual-plan` makes a plan you answer in the page instead of a page you only read. It opens on the change as a drawing whose numbered parts match a short list of claims. You pick options for the decisions the agent cannot make alone, mark its guesses right or wrong, comment on any words you select, then approve or request changes. Changing an option redraws the figure. Keyboard shortcuts and saved answers make long plans quick to get through.
+- After the build, the same plan becomes a receipt: each claim shows whether it was built, changed, or dropped, next to the check that proves it.
+- Plans are written with a few short tags. The renderer reads the cited code from your repository and stops on file paths or line numbers that do not exist. Boxes-and-arrows diagrams (`<ve-flow>`) are laid out for the agent, so it no longer places coordinates by hand.
+- `/compare` draws two or more options side by side, recommends one, and lets you pick in the page; your pick comes back to the agent in the reply.
+- Any page can be answered, not only plans. Select words or click part of a figure to comment or ask, and a quiet Reply button gathers your notes into one reply. `<ve-ask>` puts a question with options on any page, and your answer joins the reply. In Pi, a page opened in a Glimpse window sends the reply straight into the chat when you press Send to agent; elsewhere it is copied for you to paste.
+- Diagrams carry their numbers and notes on the drawing. A wait, a size, or a time window is drawn as a dimension line on the span it measures. Numbered callouts match the steps of a step-through. A finding that lives in one small part, such as file permission bits, gets a close-up of that part.
+- A step-through can replay a state machine one event at a time. The whole machine stays drawn while each event lights the route it took and dots run along it. Queues fill and drain, worker slots fill and free up, and counts change in place. Each caption says why the event happened and cites the code behind it. `examples/replay-job-queue.html` shows all of it.
+- `<ve-bars>`, `<ve-waffle>`, and `<ve-stack>` turn a few numbers into a chart, with units on every label and one scale across charts that share a `max`. `<ve-flow>` works on any page too. Hand-drawn diagrams stay the default.
+- Pages are written as a short source, `<name>.src.html`, with one kit line in its head; the renderer adds the shared styles, fonts, diagram parts, and script. The reference page takes 64% fewer tokens to write, and renders the same. Pi `render` and MCP `visual_explainer_render_html` take the source as `path`; elsewhere, run `node kit/render.mjs <name>.src.html`.
+- Revisions, including `/fact-check` corrections, are small edits to the kept source and a new render; the agent never writes the whole page again.
+- One kit carries all four looks. `data-register` on `<html>` picks Instrument, Blueprint, Paper, or Editorial, with its fonts and light and dark colors.
+- Every render reports its figures, uncaptioned figures, tags, and prose words in one line, and a mistake in a tag stops the render and names its line. `node kit/check.mjs page.html` opens the page in Chrome at phone and desktop widths and reports script errors, sideways scrolling, and labels under 12 px.
+- The MCP server serves the skill's reference docs as resources, so a client that cannot read files can follow them.
+
+### Changed
+- `/plan-review` writes its review as a plan page: each finding comes with evidence from the code and a suggested fix you accept or reject, and your answers come back as one response.
+- `/diff-review` asks about each risk worth fixing, so your reply comes back as the list of fixes to make. On someone else's PR it drafts review comments and never posts them. `/project-recap` ends by asking where to start. Both chart sizes and churn with the new data tags.
+- The guidance an agent reads for a diagram is about 60% shorter, and the always-on tool descriptions in Pi and MCP are shorter too.
+- A page opened in a Pi Glimpse window now closes when the session ends, as plan windows do.
+- A printed page uses its own look's colors on white, not the default amber.
+
+### Removed
+- `--quick` mode, along with Pi `action: "render_quick"` and MCP `visual_explainer_render_quick`. A full page now costs about as little to write, and it gets replies, the four looks, and the page checks that quick pages lacked. Drop `--quick` from any saved prompts.
 
 ### Fixed
 - Section navigation on narrow screens no longer shows a grey scrollbar under the links. The links scroll with a faded edge, and buttons such as a skim toggle stay in place.
-- Sources at the end of a page are now always visible. They were hidden in a small grey toggle that readers easily missed, so they now sit in their own section at full size.
+- Sources at the end of a page are always visible, in their own section at full size, instead of hidden behind a small grey toggle.
+- In Pi, pressing Send to agent in a Glimpse plan window after `/new`, `/resume`, `/fork`, or `/reload` no longer crashes pi. Thanks to [@masonc15](https://github.com/masonc15) for #112.
+- A `VISUAL_EXPLAINER_OUTPUT_DIR` that passes through a symlink is now rejected before the directory is created, and the error shows where the path really leads, such as `/private/tmp` for `/tmp` on macOS. The default `~/.agent/diagrams/` still follows a symlinked `~/.agent`. Thanks to [@tharanee-bit](https://github.com/tharanee-bit) for #115.
+- Pages that use `$$` outside math, such as a `$$` query helper in a script or prices like `$$5`, no longer break on render. Thanks to [@tharanee-bit](https://github.com/tharanee-bit) for #115.
+- The reference page's small failure-mode diagrams drew their lower labels at 11.4 px on wide screens; they are now 12.3 px or more at every width.
 
 ## [0.12.0] - 2026-10-02
 
