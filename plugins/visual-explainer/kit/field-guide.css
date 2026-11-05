@@ -1,0 +1,216 @@
+/* Field Guide register (the fork's house default, references/field-guide.md). The renderer inlines this file after kit.css,
+   only on a page with data-register="field-guide", so these rules restyle the kit's own parts. Tokens sit in :where() and
+   every rule here has the specificity of the kit rule it replaces, so a page's own CSS still wins.
+   Light is the default. kit/theme.js sets data-theme from the switch, a stored choice, or T3's background. */
+
+:where(:root) {
+  color-scheme: light;
+  --bg: #f4efe6; --surface: #fbf8f2; --border: #a9a296; --border-bright: #121212;
+  --text: #121212; --text-dim: #55504a; --accent: #1f4bd8; --accent-dim: rgba(31,75,216,.12);
+  --ok: #1d7443; --warn: #7a5e00; --risk: #b0341a; --info: #1a6890;
+  --node-top: var(--surface); --lift: rgb(18 18 18 / .12); --halo: 22%;
+  --font-body: 'Instrument Sans', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-display: 'Bricolage Grotesque', 'Segoe UI', sans-serif; --display-weight: 800;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --r-1: 2px; --r-2: 0px;
+  --stage: none;
+  /* the field colours are the same in both schemes; text on tomato or butter is --on-field, on cobalt --on-cobalt */
+  --cobalt: #1f4bd8; --tomato: #ef5a3c; --butter: #f6d44c; --on-field: #121212; --on-cobalt: #fff;
+  --cobalt-fg: #1f4bd8; --tomato-fg: #b0341a; --shadow: #121212; --note-shadow: #121212; --code-bg: rgba(18,18,18,.06);
+  /* the inverse field: ink in light, bone in dark */
+  --inv-bg: #121212; --inv-surface: #1f1c18; --inv-fg: #f4efe6; --inv-mut: #d9d3c8; --inv-rule: #4a4640; --inv-accent: #f6d44c;
+  --inv-ok: #6cc492; --inv-warn: #e3b94d; --inv-risk: #ff8d73; --inv-info: #6fb8dc;
+}
+@media (prefers-color-scheme: dark) {
+  :where(:root:not([data-theme="light"])) {
+    color-scheme: dark;
+    --bg: #14120f; --surface: #1d1a16; --border: #5a534a; --border-bright: #f1ebe0;
+    --text: #f1ebe0; --text-dim: #b3aa9b; --accent: #8ea6ff; --accent-dim: rgba(142,166,255,.14);
+    --ok: #6cc492; --warn: #e3b94d; --risk: #ff8d73; --info: #6fb8dc;
+    --lift: rgb(0 0 0 / .45); --halo: 32%;
+    --cobalt-fg: #8ea6ff; --tomato-fg: #ff8d73; --shadow: #000; --note-shadow: #1f4bd8; --code-bg: rgba(241,235,224,.09);
+    --inv-bg: #f1ebe0; --inv-surface: #fbf8f2; --inv-fg: #121212; --inv-mut: #4f493f; --inv-rule: #c9c1b3; --inv-accent: #1f4bd8;
+    --inv-ok: #1d7443; --inv-warn: #7a5e00; --inv-risk: #b0341a; --inv-info: #1a6890;
+  }
+}
+:where(:root[data-theme="dark"]) {
+  color-scheme: dark;
+  --bg: #14120f; --surface: #1d1a16; --border: #5a534a; --border-bright: #f1ebe0;
+  --text: #f1ebe0; --text-dim: #b3aa9b; --accent: #8ea6ff; --accent-dim: rgba(142,166,255,.14);
+  --ok: #6cc492; --warn: #e3b94d; --risk: #ff8d73; --info: #6fb8dc;
+  --lift: rgb(0 0 0 / .45); --halo: 32%;
+  --cobalt-fg: #8ea6ff; --tomato-fg: #ff8d73; --shadow: #000; --note-shadow: #1f4bd8; --code-bg: rgba(241,235,224,.09);
+  --inv-bg: #f1ebe0; --inv-surface: #fbf8f2; --inv-fg: #121212; --inv-mut: #4f493f; --inv-rule: #c9c1b3; --inv-accent: #1f4bd8;
+  --inv-ok: #1d7443; --inv-warn: #7a5e00; --inv-risk: #b0341a; --inv-info: #1a6890;
+}
+
+/* base: square, ink-ruled, serif italic for a few words */
+body { line-height: 1.55; transition: background-color var(--med), color var(--med); }
+::selection { background: var(--butter); color: var(--on-field); }
+:focus-visible { outline: 3px solid var(--cobalt-fg); outline-offset: 3px; }
+:where(em) { font-family: var(--font-serif); font-style: italic; font-weight: 400; letter-spacing: 0; font-size: 1.08em; }
+h1 { letter-spacing: -.045em; line-height: .98; }
+h2 { font-weight: 700; letter-spacing: -.03em; line-height: 1.05; }
+h3 { font-family: var(--font-display); font-weight: 700; letter-spacing: -.015em; }
+/* the answer as a poster numeral, the rest of the headline under it */
+h1 .num { display: block; font-size: clamp(5.5rem, 22vw, 11rem); line-height: .8; letter-spacing: -.07em; color: var(--text); margin: 0 0 .12em -.04em; }
+h1 .num .unit { font-size: .55em; font-weight: 700; letter-spacing: -.02em; color: var(--cobalt-fg); }
+.eyebrow { color: var(--text); font-weight: 600; letter-spacing: .06em; padding-bottom: var(--s-3); border-bottom: 3px solid var(--text); }
+.eyebrow::before { display: none; }
+.lead { color: var(--text); }
+.ve-label { font-size: 13px; letter-spacing: .06em; }
+.caps { letter-spacing: .06em; }
+.sec-head { border-top: 3px solid var(--text); }
+/* a plate number ("01") in the label column of a section opener */
+.fg-no { display: block; font: 800 clamp(3rem, 8vw, 5rem)/.8 var(--font-display); letter-spacing: -.06em; color: var(--text); margin-bottom: var(--s-3); }
+code { background: var(--code-bg); padding: 1px 4px; border-radius: var(--r-1); }
+:where(pre) code { background: none; padding: 0; }
+:where(pre) { border: 1.5px solid var(--text); }
+
+/* the plate: a figure frame on the surface, inked border, hard shadow */
+.frame { background: var(--surface); border: 3px solid var(--text); box-shadow: 10px 10px 0 var(--shadow); margin-right: 10px; }
+.fig-n { text-transform: uppercase; letter-spacing: .06em; }
+figcaption { color: var(--text); }
+
+/* drawn parts: flat inked boxes; the key part is the cobalt field; verbs on arrows in serif italic */
+.ve-n .sh { fill: var(--surface); stroke: var(--border-bright); stroke-width: 2.5; filter: none; }
+.ve-n .lid { fill: var(--surface); }
+.ve-n text { font-family: var(--font-display); font-weight: 700; }
+.ve-n .sub, .ve-n .ve-kind { fill: var(--text-dim); }
+.ve-n.is-key .sh { fill: var(--cobalt); stroke: var(--border-bright); stroke-width: 2.5; filter: none; }
+.ve-n.is-key text { fill: var(--on-cobalt); }
+.ve-n.is-key .sub, .ve-n.is-key .ve-kind { fill: #dfe6ff; }
+.ve-n.is-key .gl { stroke: var(--on-cobalt); }
+.ve-e { stroke: var(--text); stroke-width: 2; }
+.ve-e.is-hot { stroke: var(--accent); stroke-width: 4; filter: none; }
+.ve-el { fill: var(--text); font: italic 400 19px var(--font-serif); stroke: var(--surface); }
+.ve-bnd { stroke: var(--text-dim); stroke-width: 1.5; }
+.ve-x { stroke: var(--surface); }
+.ve-co circle { fill: var(--text); stroke: var(--surface); stroke-width: 3; }
+.ve-co text { fill: var(--surface); }
+.ve-co.now circle { fill: var(--butter); stroke: var(--on-field); } .ve-co.now text { fill: var(--on-field); }
+.ve-slot.is-on { fill: var(--butter); stroke: var(--on-field); }
+.ve-tok { fill: var(--accent); }
+.ve-stack rect { fill: var(--surface); stroke: var(--border-bright); stroke-width: 2; }
+.ve-stack rect.hot { fill: var(--cobalt); }
+
+/* the stepper's controls: inked, square, hard shadow */
+button { font-weight: 600; text-transform: uppercase; letter-spacing: .04em; border: 2px solid var(--text); border-radius: 0; box-shadow: 3px 3px 0 var(--text); }
+button:hover, button:focus-visible { border-color: var(--text); background: color-mix(in srgb, var(--butter) 35%, var(--surface)); }
+button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--text); }
+.ve-player input { accent-color: var(--cobalt-fg); }
+.ve-cap li::before { color: var(--text); }
+
+/* KPI strip: ink rules between cells, numerals in the display face */
+.kpis { background: var(--text); border: 3px solid var(--text); gap: 2px; }
+.kpi .val { font: 800 3.25rem/1 var(--font-display); letter-spacing: -.06em; }
+
+/* specimen cards: small multiples with an inked border; .fg-top colours the header strip */
+.case { border: 3px solid var(--text); }
+.case.is-lit { border-color: var(--accent); }
+.ve-mini .ve-n .sh { stroke-width: 2; }
+
+/* chips are pills, shape + word */
+.chip { border-width: 2px; border-radius: 99px; padding: 2px var(--s-3) 2px var(--s-2); text-transform: uppercase; letter-spacing: .06em; background: var(--surface); }
+
+/* tables: an ink header row, dashed row rules */
+.ve-table { border: 3px solid var(--text); }
+.ve-table thead th { background: var(--text); color: var(--bg); }
+.ve-table th, .ve-table td { border-bottom: 1px dashed var(--border); }
+
+/* section nav */
+.ve-toc { border-bottom: 3px solid var(--text); }
+.ve-toc a[aria-current] { background: var(--butter); color: var(--on-field); }
+
+details, .sources { border-top: 1.5px solid var(--text); }
+:where(dl) { display: grid; grid-template-columns: auto minmax(0, 1fr); border-top: 1.5px solid var(--text); }
+:where(dt, dd) { margin: 0; padding: var(--s-2) 0; border-bottom: 1px dashed var(--border); line-height: 1.4; }
+:where(dt) { font: 500 12.5px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--text-dim); padding-right: var(--s-4); padding-top: .65rem; }
+
+/* ── Field Guide parts (references/field-guide.md) ── */
+
+/* field note: the butter card beside the headline. Its offset block is a box-shadow: the kit's entrance transform would lift
+   a z-index:-1 ::before over the card */
+.fg-note { background: var(--butter); color: var(--on-field); padding: clamp(20px, 3vw, 30px); margin: 0 10px 10px 0; display: grid; gap: var(--s-3); max-width: 38rem; box-shadow: 10px 10px 0 var(--note-shadow); }
+.fg-note .ve-label { color: var(--on-field); display: flex; justify-content: space-between; gap: var(--s-3); border-bottom: 2px solid var(--on-field); padding-bottom: var(--s-2); text-transform: uppercase; }
+.fg-note .lead { color: var(--on-field); max-width: none; }
+.fg-note .lead b { color: var(--on-field); }
+.fg-note .meta { color: var(--on-field); }
+.fg-note code { background: rgba(18,18,18,.08); }
+/* the one warning, as a tilted stamp */
+.fg-stamp { display: inline-flex; align-items: center; gap: var(--s-2); justify-self: start; font: 600 13px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; background: var(--tomato); color: var(--on-field); border: 2px solid var(--on-field); padding: 7px 10px; transform: rotate(-1.5deg); }
+
+/* a mono label row across the top of a plate or a specimen card; data-field colours it */
+.fg-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--s-2) var(--s-3); font: 500 13px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; padding-bottom: var(--s-2); border-bottom: 1.5px solid var(--text); }
+.case > .fg-top { margin: calc(-1 * var(--s-4)) calc(-1 * var(--s-4)) 0; padding: var(--s-2) var(--s-4); border-bottom: 3px solid var(--text); }
+.fg-top[data-field="cobalt"] { background: var(--cobalt); color: var(--on-cobalt); }
+.fg-top[data-field="butter"] { background: var(--butter); color: var(--on-field); }
+.fg-top[data-field="tomato"] { background: var(--tomato); color: var(--on-field); }
+.fg-top[data-field="ink"] { background: var(--text); color: var(--surface); }
+.fg-top .chip { color: var(--text); }
+
+/* colour fields: a section that redefines the tokens, so every kit part inside follows */
+.fg-inv, .fg-cobalt { background: var(--bg); color: var(--text); padding: var(--s-7) clamp(16px, 4vw, 40px); }
+.fg-inv {
+  --bg: var(--inv-bg); --surface: var(--inv-surface); --text: var(--inv-fg); --text-dim: var(--inv-mut); --border: var(--inv-rule); --border-bright: var(--inv-fg);
+  --accent: var(--inv-accent); --accent-dim: color-mix(in srgb, var(--inv-accent) 20%, transparent); --cobalt-fg: var(--inv-accent);
+  --ok: var(--inv-ok); --warn: var(--inv-warn); --risk: var(--inv-risk); --info: var(--inv-info); --shadow: var(--inv-accent);
+  --code-bg: color-mix(in srgb, var(--inv-fg) 12%, transparent);
+}
+.fg-cobalt {
+  --bg: var(--cobalt); --surface: #2b56e0; --text: #fff; --text-dim: #dfe6ff; --border: #8ea6ff; --border-bright: #fff;
+  --accent: var(--butter); --accent-dim: rgba(246,212,76,.22); --cobalt-fg: var(--butter);
+  --ok: #c6f2d6; --warn: var(--butter); --risk: #ffc9bb; --info: #fff; --shadow: #121212;
+  --code-bg: rgba(255,255,255,.14);
+}
+:where(.fg-inv, .fg-cobalt) .sec-head { border-top: 0; padding-top: 0; }
+:where(.fg-inv, .fg-cobalt) h1 .num, :where(.fg-inv, .fg-cobalt) .fg-no, :where(.fg-inv) .kpi .val { color: var(--accent); }
+.fg-cobalt em { color: var(--butter); }
+
+/* takeaways: serif numerals over short claims, usually on the cobalt field */
+.fg-takes { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: var(--s-6); border-top: 3px solid var(--text); }
+.fg-takes > li { padding-top: var(--s-4); display: grid; gap: var(--s-2); align-content: start; }
+.fg-takes .n { font: italic 400 clamp(3rem, 6vw, 4.4rem)/.8 var(--font-serif); color: var(--accent); margin-bottom: var(--s-2); }
+.fg-takes h3 { font-size: 1.45rem; }
+
+/* hazards: a tag column and a claim column between ink rules */
+.fg-hz { list-style: none; padding: 0; border-top: 3px solid var(--text); }
+.fg-hz > li { display: grid; grid-template-columns: minmax(0, 10rem) minmax(0, 1fr); gap: var(--s-2) var(--s-6); padding: var(--s-5) 0; border-bottom: 1.5px solid var(--text); }
+.fg-hz h3 { font-size: 1.35rem; margin-bottom: var(--s-2); }
+.fg-hz p { max-width: 60ch; }
+@media (max-width: 40rem) { .fg-hz > li { grid-template-columns: minmax(0, 1fr); } }
+.fg-tag { justify-self: start; align-self: start; font: 600 12.5px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; padding: 6px 9px; border: 2px solid var(--text); background: var(--surface); color: var(--text); }
+.fg-tag.risk { background: var(--tomato); color: var(--on-field); border-color: var(--on-field); }
+.fg-tag.check { background: var(--butter); color: var(--on-field); border-color: var(--on-field); }
+
+/* one switch callout per page, for the rollback or the key setting */
+.fg-switch { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--s-4) var(--s-5); align-items: center; background: var(--surface); border: 3px solid var(--text); padding: var(--s-4) var(--s-5); margin: 0 11px 11px 0; box-shadow: 8px 8px 0 var(--butter), 8px 8px 0 3px var(--text); }
+.fg-switch b { font: 800 clamp(1.5rem, 3.4vw, 2.1rem)/1 var(--font-display); letter-spacing: -.03em; }
+.fg-switch code { background: var(--butter); color: var(--on-field); padding: 3px 6px; }
+@media (max-width: 40rem) { .fg-switch { grid-template-columns: minmax(0, 1fr); } }
+
+/* the light/dark switch kit/theme.js adds: top right of the page, or the end of the section nav */
+.fg-theme { position: absolute; top: 14px; right: 14px; z-index: 21; display: flex; border: 2px solid var(--text); background: var(--surface); box-shadow: 3px 3px 0 var(--shadow); }
+.ve-toc > .fg-theme { position: static; flex: none; box-shadow: none; }
+.fg-theme button { all: unset; cursor: pointer; font: 600 12px/1 var(--font-mono); letter-spacing: .08em; text-transform: uppercase; padding: 8px 10px; color: var(--text); }
+.fg-theme button + button { border-left: 2px solid var(--text); }
+.fg-theme button[aria-pressed="true"] { background: var(--text); color: var(--surface); }
+.fg-theme button:focus-visible { outline: 3px solid var(--cobalt-fg); outline-offset: 2px; }
+
+@media (max-width: 40rem) {
+  .frame { box-shadow: 6px 6px 0 var(--shadow); margin-right: 6px; }
+  .fg-note { box-shadow: 6px 6px 0 var(--note-shadow); margin: 0 6px 6px 0; }
+}
+
+/* ── T3 visual page (references/t3.md): the thread is the ground, the left edge meets the reply text ── */
+.t3 body { background: none; }
+.t3 main { padding: var(--s-6) 12px var(--s-6) 0; }
+.t3 .ve-toc { position: static; padding: 0 12px 0 0; background: none; }
+.t3 .fg-theme { display: none; }
+
+@media print {
+  :where(:root) { --bg: #fff; --surface: #fff; --border: #a9a296; --border-bright: #121212; --text: #121212; --text-dim: #55504a; --accent: #1f4bd8; --ok: #1d7443; --warn: #7a5e00; --risk: #b0341a; --info: #1a6890; --cobalt-fg: #1f4bd8; --tomato-fg: #b0341a; --shadow: #121212; }
+  .fg-theme { display: none; }
+  .frame, .fg-switch, .fg-note { box-shadow: none; }
+}

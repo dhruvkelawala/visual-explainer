@@ -1,94 +1,84 @@
 # Field Guide (house style)
 
-The default look for every page this skill makes: reviews, architecture, concepts, recaps and plans. It reads like a naturalist's field guide printed as a Swiss poster: a bone ground, bold flat colour fields, poster-scale numerals, numbered plates and specimen cards.
+The default look for every page this skill makes: reviews, architecture, concepts, recaps and teaching pages. It reads like a naturalist's field guide printed as a Swiss poster: a bone ground, bold flat colour fields, poster-scale numerals, numbered plates and specimen cards.
 
-`templates/field-guide.html` is the reference build. Copy its parts (tokens, theme switch, CSS, scripts, components), not its outline. Where this file and `style-guide.md` disagree, this file wins. The style guide still governs words, figure choice, typography rules, accessibility and the polish pass.
+Field Guide is a kit register. `data-register="field-guide"` selects it, and the renderer uses it when a page names no register. The kit then adds `kit/field-guide.css` after its own CSS, so every kit part (nodes, edges, KPI strips, cases, chips, tables, the stepper) takes the Field Guide look. It also adds a head script that sets light or dark. A page writes only its own layout CSS. Where this file and `style-guide.md` disagree, this file wins. The style guide still governs words, figure choice, accessibility and the look rules.
 
-Never use the Blueprint register. Use Instrument, Paper or Editorial only when the user names one.
+`templates/field-guide.src.html` is the reference source: a cache-aside review that uses every part below. Copy its parts, not its outline. Render it with `kit/render.mjs` to see them.
 
-The renderers already use it: `plan/plan.css` (plan pages, with the same light/dark switch) and `quick/base.css` (quick mode, which has no script and follows the system scheme) share these tokens and fonts.
+Never use the Blueprint register. Use Instrument, Paper or Editorial only when the user names one. Plan pages (`plan/plan.css`) use the same tokens and fonts, with the same switch.
 
 ## Tokens
 
-Light is the default. Dark redefines tokens only. Field colours (`--cobalt --tomato --butter`) are the same in both schemes. Text on a tomato or butter field is always `--on-field`; text on cobalt is `--on-cobalt`.
+The register sets the kit's tokens (`--bg --surface --border --border-bright --text --text-dim --accent --ok --warn --risk --info`) and these of its own. Light is the default; dark redefines tokens only. The field colours are the same in both schemes. Text on a tomato or butter field is always `--on-field`; text on cobalt is `--on-cobalt`.
 
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| `--bg` | `#f4efe6` | `#14120f` | page ground, mini-plate ground |
-| `--surface` | `#fbf8f2` | `#1d1a16` | plates, cards, buttons |
-| `--fg` | `#121212` | `#f1ebe0` | text, 3px borders, strokes |
-| `--muted` | `#55504a` | `#b3aa9b` | labels, secondary text |
-| `--rule` | `#a9a296` | `#5a534a` | dashed row rules |
-| `--shadow` | `#121212` | `#000` | hard offset shadows |
-| `--code-bg` | `rgba(18,18,18,.06)` | `rgba(241,235,224,.09)` | inline code |
+| `--bg` | `#f4efe6` | `#14120f` | page ground |
+| `--surface` | `#fbf8f2` | `#1d1a16` | plates, cards, buttons; the label halo on a drawing |
+| `--text`, `--border-bright` | `#121212` | `#f1ebe0` | text, 3px borders, node strokes |
+| `--text-dim` | `#55504a` | `#b3aa9b` | labels, secondary text |
+| `--border` | `#a9a296` | `#5a534a` | dashed row rules |
+| `--accent` | `#1f4bd8` | `#8ea6ff` | the hot path, the unit in a headline numeral |
 | `--cobalt` / `--tomato` / `--butter` | `#1f4bd8` / `#ef5a3c` / `#f6d44c` | same | colour fields, fills |
 | `--on-field` / `--on-cobalt` | `#121212` / `#fff` | same | text on fields |
-| `--cobalt-fg` | `#1f4bd8` | `#8ea6ff` | cobalt as text or line on the ground |
-| `--tomato-fg` | `#b0341a` | `#ff8d73` | tomato as text or line on the ground |
-| `--spine` | `#1f4bd8` | `#4d72ff` | the main path in a plate |
-| `--inv-bg` / `--inv-fg` | `#121212` / `#f4efe6` | `#f1ebe0` / `#121212` | the inverse field (ink in light, bone in dark) |
-| `--inv-accent` / `--inv-mut` / `--inv-rule` / `--inv-mid` | `#f6d44c` / `#d9d3c8` / `#4a4640` / `#8d877d` | `#1f4bd8` / `#4f493f` / `#c9c1b3` / `#8d877d` | numbers, notes, rules and neutral marks on the inverse field |
-| `--dim-line` / `--dim-text` / `--dim-cobalt` / `--dim-butter` | `#d3ccc0` / `#bdb6aa` / `#c8d2f4` / `#efe6c0` | `#3a352e` / `#6e675c` / `#232d5c` / `#4a4226` | opaque dimming inside a plate |
+| `--cobalt-fg` / `--tomato-fg` | `#1f4bd8` / `#b0341a` | `#8ea6ff` / `#ff8d73` | cobalt or tomato as text or a line on the ground |
+| `--shadow` | `#121212` | `#000` | hard offset shadows |
+| `--inv-*` | ink ground, bone text, butter accent | bone ground, ink text, cobalt accent | the inverse field (`.fg-inv`) |
+| `--font-display` / `--font-serif` | Bricolage Grotesque 800 / Instrument Serif | same | headings and numerals / a few italic words |
 
-Never put raw `--tomato` or `--butter` text on the ground; use `--tomato-fg`, and never use butter as text. In SVG, set colours with classes or `style="fill:var(--…)"`, because presentation attributes do not read CSS variables. The only literal hex values allowed in SVG are the constant field colours and the text that sits on them.
+Never put raw `--tomato` or `--butter` text on the ground; use `--tomato-fg`, and never use butter as text on bone. In SVG, set colours with kit classes or `style="fill:var(--…)"`, because presentation attributes do not read CSS variables.
 
 ## Fonts
 
-Bricolage Grotesque 700–800 for display and numerals, Instrument Serif italic for a few words, Instrument Sans for body, and JetBrains Mono for labels. Load them in one Google Fonts link at every weight used. Body is 17px. Labels are mono at 13px, uppercase, `.06em` tracking.
+Bricolage Grotesque for display and numerals, Instrument Serif italic for a few words, Instrument Sans for body, and JetBrains Mono for labels. The renderer loads them. Body is 17px. Labels are mono at 13px, uppercase, `.06em` tracking.
 
-Serif italic marks only these: the tail of a headline (“…five gates. *Any ‘no’ is silence.*”), verbs on figure arrows, specimen names (“The *Cold* Miss”), takeaway numerals (*One. Two. Three.*), and the plate subtitle.
+`<em>` is Instrument Serif italic. Use it only for the tail of a headline (“…five gates. *Any ‘no’ is silence.*”), specimen names (“The *Cold* Miss”) and takeaway numerals (*One. Two. Three.*). Edge labels on a drawing (`.ve-el`, `<ve-edge label>`) are serif italic too, so write them as verbs.
 
 ## Light and dark
 
-- `:root` holds the light tokens. `:root[data-theme=dark]` holds the dark tokens, and the same dark block repeats inside `@media (prefers-color-scheme:dark){:root:not([data-theme=light]){…}}`. Without JS, the page follows the system.
-- A fixed switch sits at the top right: two buttons, **Light** and **Dark**, with `aria-pressed`, a 2px `--fg` border, a `--surface` ground and a 3px hard shadow. The pressed button inverts (`--fg` ground, `--surface` text). Hide it in print and without JS.
-- Clicking sets `document.documentElement.dataset.theme` and stores it in `localStorage` (key `fg-theme`, inside `try/catch`, because `file://` pages can throw). A one-line script in `<head>` applies the stored choice before first paint. The switch reflects the system scheme until the reader chooses.
-- In T3 (`references/t3.md`), the page follows T3's background instead of the system scheme or a stored choice, and the switch is hidden.
-- What flips: the ground, surfaces, text and borders; the inverse field (ink band in light, bone band in dark, with a butter accent in light and a cobalt accent in dark); and the hero note's offset shadow (ink in light, cobalt in dark). What does not flip: the cobalt, tomato and butter fields.
+- `kit/theme.js` runs in `<head>`. Outside T3 it applies the reader's stored choice (`localStorage` key `fg-theme`), else the system scheme. It adds a **Light / Dark** switch at the end of the section nav, or at the top right when there is no nav.
+- In T3 (`references/t3.md`) it reads T3's background instead and leaves the switch out.
+- What flips: the ground, surfaces, text and borders, and the inverse field (an ink band in light, a bone band in dark). What does not flip: the cobalt, tomato and butter fields.
 
 ## Page structure
 
-1. **Topbar.** Mono labels on one line (`Field Guide No. N · subject` on the left, the scope on the right) over a 3px `--fg` rule. Leave room on the right for the theme switch.
-2. **Hero.** The answer as a giant numeral (`clamp(7rem,26vw,13rem)`, weight 800, `-.07em` tracking) with its unit in cobalt, then the rest of the headline at `clamp(2.1rem,5.6vw,3.8rem)`. Beside it (stacked under 860px), a butter **Field note** card with a hard 10px offset shadow: a mono label row, a one- or two-sentence deck with one bold phrase, a mono meta line and an optional tilted tomato **stamp** for the one warning (for example “One-way door”).
-3. **Sections.** Each opens with a giant section number (`01`, weight 800), a mono label (`Plate I · Anatomy of a read`) and an `h2` that states the takeaway and ends with a serif italic phrase.
-4. **Colour fields.** At most one full-width colour field per screen. A good order: bone hero → bone Plate I → inverse field for numbers → bone Plate II → bone hazards → cobalt takeaways.
+1. **Header.** `.eyebrow` (`Field Guide · subject`) over a 3px rule. Then the answer: `<h1><span class="num">94<span class="unit">%</span></span> of reads never touch <em>Postgres.</em></h1>`. The numeral is poster scale and its unit is cobalt. Beside it, or under it on a phone, a `.fg-note`. Put the two in a two-column grid of your own; the reference source shows one.
+2. **Sections.** Each opens with `.sec-head`: a `.fg-no` plate number (`01`) and a mono label (`Plate I · Anatomy of a read`) in the label column, and an `h2` that states the takeaway and ends with an `<em>` phrase.
+3. **Colour fields.** At most one full-width colour field per screen. A good order: bone header → bone Plate I → `.fg-inv` for numbers → bone Plate II → bone hazards → `.fg-cobalt` takeaways.
 
-## Components
+## Parts
 
-| Component | Spec |
+The kit's parts (`kit.md`) work as written and take the Field Guide look. These are Field Guide's own:
+
+| Part | Markup |
 |---|---|
-| **Plate** (the main figure) | `--surface` panel, 3px `--fg` border, 10px hard offset shadow. A top row holds the mono plate label with a serif subtitle and the source path. Inside, an anatomical SVG sits beside the **key** at ≥1000px and above it when narrower. Stages are square-cornered boxes with numbered ink badges on the left edge, on a 12px `--spine` line with moving `--surface` dots (hidden under reduced motion). Serif-italic verbs sit beside the spine. Failure or alternate paths are 3px dashed `--tomato-fg` branches into a tomato side column. The goal or last stage is a cobalt box with a butter badge, and the outcome is a butter box. |
-| **Key as a stepper** | An `<ol>` of buttons, one per numbered stage: a numbered dot, a display-font title, one or two sentences, and an optional mono `--tomato-fg` line for what happens on failure. Clicking a stage selects it (butter row, `aria-pressed`), keeps it full strength in the SVG and dims the rest. Dim stage boxes with the opaque `--dim-*` tokens, not opacity, so the spine never shows through. Verbs, branches and side-column lines may use opacity `.16`. Below the key: **Walk the path →** / **← Back** / **Show all** buttons and a `Gate N of M` read-out. Arrow keys move through the key, and Escape shows all. `#gate=N` in the URL opens a stage. Without JS, everything shows. |
-| **Measurements** | On the inverse field. A 3-column strip with a 3px top rule and 1.5px column rules. Each cell has a giant `--inv-accent` numeral (with `/N` or the unit at half size in `--inv-mut`), a mono caption that wraps, and its picture: a stacked bar with a key, square pips, a waffle, bars or a sparkline. Every number gets a picture. |
-| **Specimen cards** | Small multiples for cases, states, options or failure modes. A 3px border and a coloured header strip with `Specimen No. N` and a status chip (shape + word). The header colour carries meaning: **cobalt** for the normal or desired case, **butter** for paused or caution, **tomato** for stopped or risk, **ink** (`--fg` ground) for skipped or neutral. Then a display title with one serif word (“The *Shared* Thread”), a mini plate (the same small drawing in every card, on `--bg`, with only the changed part coloured), and a `<dl>` of mono field names: **Field mark** (how to recognise it), **Habitat** (when it happens), **Behaviour**, then **Cost**, **Undo**, **Ends when** or **Watch for**. |
-| **Hazards** | A list with a 3px top rule and 1.5px row rules. The left column holds a tag (`■ Risk` tomato, `○ Check` butter, `▲ Later` surface) and an optional mono SHA chip. The right column holds a display title and one or two sentences. |
-| **Switch callout** | One per page for the rollback or the key setting: a `--surface` box with a 3px border and a double hard shadow (8px butter, then an 8px `--fg` outline). Big display label on the left, the setting in a butter `code` on the right. |
-| **Takeaways** | On the cobalt field. Three columns with a 3px white top rule. Each has a butter serif numeral (*One.*), a display title and one or two sentences. |
-| **Chips and tags** | Mono 13px, uppercase, 2px `--fg` border. Chips are pills; tags are square. Always shape + word: ● follows or ok, ○ paused or check, ■ stops or risk, ▲ skipped or later, ◆ write or change. |
+| Field note | `<div class="fg-note">`: `<p class="ve-label"><span>Field note</span><span>Obs. · 7 days</span></p>`, a `.lead` with one bold phrase, a `.meta` line, and an optional `<span class="fg-stamp">■ Two-way door</span>` for the one warning |
+| Plate | the kit's `figure` › `.frame`: a surface panel with a 3px border and a hard 10px shadow. A plate that steps is the kit's stepper (`motion.md`); the key node (`key` on `<ve-node>`, `.is-key`) is the cobalt box |
+| Plate number | `<span class="fg-no">01</span>` above the label in `.sec-head` |
+| Label row | `<div class="fg-top">`: mono labels split left and right over a rule. In a `.case`, `data-field="cobalt\|butter\|tomato\|ink"` colours it as the card's header strip |
+| Inverse field | `<section class="fg-inv">`: redefines the tokens, so a KPI strip or a figure inside it follows. Numbers go here |
+| Cobalt field | `<section class="fg-cobalt">`: white text, butter accent and `<em>`. Takeaways go here |
+| Specimen cards | the kit's `.cases` › `.case[data-st]`: a `.fg-top` header strip with `Specimen No. N` and a chip, an `h3` with one `<em>` word, the same `.ve-mini` drawing in every card with only the changed part `.is-st`, and a `<dl>` of **Field mark** (how to recognise it), **Habitat** (when it happens), then **Cost**, **Behaviour**, **Undo** or **Watch for**. Header colour: cobalt for the normal case, butter for caution, tomato for risk, ink for neutral |
+| Hazards | `<ul class="fg-hz">` › `<li>`: a `<span class="fg-tag risk\|check">■ Risk</span>` (no class for **Later**), then a `<div>` with an `h3` and one or two sentences |
+| Switch callout | `<div class="fg-switch"><b>Kill switch</b><p><code>flag=false</code> does …</p></div>`, one per page, for the rollback or the key setting |
+| Takeaways | `<ol class="fg-takes">` › `<li>`: `<span class="n">One.</span>`, an `h3`, one or two sentences |
+
+Chips are pills and tags are square. Both carry shape and word: ● follows or ok, ○ paused or check, ■ stops or risk, ▲ skipped or later, ◆ write or change.
 
 ## Rules that adapt the style guide
 
-- **Quiet ground, one signal, per figure.** Colour fields are structure, not signal. Inside a figure, one colour carries the main path (cobalt), tomato only marks failure or risk, and butter marks “you are here”, the selection or the outcome.
-- **Square and hard.** Square corners (radius 0–2px) except pills, chips and avatars. Shadows are hard offsets with no blur. No gradients, glows or glass.
+- **Quiet ground, one signal, per figure.** Colour fields are structure, not signal. Inside a figure, one colour carries the main path (cobalt), tomato marks only failure or risk, and butter marks “you are here”, the selection or the outcome.
+- **Square and hard.** Square corners except pills. Shadows are hard offsets with no blur. No gradients, glows or glass.
 - **Field-guide words as labels, never as jokes.** Use Plate, Specimen No., Field mark and Habitat. Never write puns or fake Latin (“Cachea asidea”).
-- **Contrast.** Check every text colour on each ground it sits on, in both schemes. `--tomato-fg` and `--cobalt-fg` exist for this. Butter is never text on bone.
-- **Big type, still readable.** SVG labels are at least 12px when rendered at 728px wide, so size the `viewBox` to the content (a vertical plate around 640 units wide renders at about 1:1 in a 728px column).
-
-## Traps seen while building it
-
-- A `::before` hard-shadow block with `z-index:-1` paints over its own card if the card has `isolation:isolate` or creates a stacking context. Leave the card without one.
-- `white-space:nowrap` on a numeral container also stops its caption `<small>` from wrapping, so it overflows into the next column. Set `white-space:normal` on the caption.
-- Labels that cross a dashed line need a halo: `paint-order:stroke` with a stroke in the ground colour.
-- Mobile: plates keep a 6px shadow, the stats and takeaways go to one column, and the topbar gets top padding so the fixed switch does not cover it.
+- **Contrast.** Check every text colour on each ground it sits on, in both schemes. `--tomato-fg` and `--cobalt-fg` exist for this.
 
 ## Extra delivery checks
 
 ```
-□ outside T3: light and dark both checked at 728px and 1280px; the switch works, persists, and follows the system before a choice
-□ in T3: the page is light on a light T3 background and dark on a dark one (`html_preview` both appearances), with the switch hidden
+□ the render shows no ✗ in light; look at the sheet once, and at the page in dark once
+□ in T3: light on a light background and dark on a dark one (`html_preview` both appearances), with no switch
 □ one full-width colour field per screen at most; tomato only for risk or failure
-□ no raw tomato or butter text on the ground; SVG colours come from tokens
-□ plate key steps through every stage; dimming is opaque; #gate=N works; everything shows without JS
-□ specimen cards share one mini drawing and use Field mark / Habitat / Behaviour
+□ specimen cards share one mini drawing and use Field mark / Habitat
 □ no Blueprint grid, IBM Plex, puns or fake Latin
 ```

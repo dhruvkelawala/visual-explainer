@@ -2,13 +2,18 @@ import { after, before, test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { chromium } from "playwright-core";
+import { prepareRenderedHtml, renderPage } from "../plugins/visual-explainer/kit/render.mjs";
 
-const template = readFileSync(
-  new URL("../plugins/visual-explainer/templates/field-guide.html", import.meta.url),
+// The reference source, rendered the way an agent renders a page: the kit, Field Guide's CSS and its head script inlined.
+const source = readFileSync(
+  new URL("../plugins/visual-explainer/templates/field-guide.src.html", import.meta.url),
   "utf8",
 );
+const rendered = renderPage(source);
+assert.deepEqual(rendered.errors, []);
+const template = prepareRenderedHtml(rendered.html);
 
-// Colours from the token table in references/field-guide.md: --fg as text, --surface as a plate.
+// Colours from the token table in references/field-guide.md: --text as text, --surface as a plate.
 const LIGHT = { text: "rgb(18, 18, 18)", surface: "rgb(251, 248, 242)" };
 const DARK = { text: "rgb(241, 235, 224)", surface: "rgb(29, 26, 22)" };
 // --bg in dark, the ground a page paints for itself outside T3.
@@ -60,8 +65,8 @@ function look(page) {
     return {
       ground: style("body").backgroundColor,
       text: style("body").color,
-      surface: style(".plate").backgroundColor,
-      switchShown: style(".theme").display !== "none",
+      surface: style(".frame").backgroundColor,
+      switchShown: !!document.querySelector(".fg-theme") && style(".fg-theme").display !== "none",
       edge: document.querySelector("h1").getBoundingClientRect().left,
       overflow: root.scrollWidth - root.clientWidth,
     };
@@ -115,15 +120,16 @@ test("a Field Guide page turns light when the reader switches T3 to light", asyn
   assert.deepEqual(seenFor(LIGHT, await look(page)), LIGHT);
 });
 
-// T3 changes only the horizontal layout: T3's 14px root and the T3 block must not shrink the type or the spacing.
+// T3 changes only the page's outer padding: T3's 14px root must not shrink the type or the gaps between sections.
 test("a Field Guide page keeps the reference build's type scale and section spacing in T3", async () => {
   const scale = async (html) =>
     (await open(html, { system: "light" })).evaluate(() => [
-      ...[...document.querySelectorAll(".hero, .sec")].map((el) => {
-        const { paddingTop, paddingBottom } = getComputedStyle(el);
-        return `${el.className}: ${paddingTop} ${paddingBottom}`;
+      `main gap: ${getComputedStyle(document.querySelector("main")).rowGap}`,
+      ...[...document.querySelectorAll(".fg-inv, .fg-cobalt")].map((el) => {
+        const { paddingTop, paddingLeft } = getComputedStyle(el);
+        return `${el.className}: ${paddingTop} ${paddingLeft}`;
       }),
-      ...["h1 .num", "h1 .rest", "h2", ".sec-no"].map(
+      ...["h1", "h1 .num", "h2", ".fg-no", ".kpi .val"].map(
         (selector) => `${selector}: ${getComputedStyle(document.querySelector(selector)).fontSize}`,
       ),
     ]);
