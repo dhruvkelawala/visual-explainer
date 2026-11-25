@@ -73,6 +73,7 @@ const promptFiles = [
   "plan-review.md",
   "project-recap.md",
   "state-machine.md",
+  "walkthrough.md",
 ];
 
 const resourceFiles = [

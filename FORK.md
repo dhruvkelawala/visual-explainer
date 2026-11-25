@@ -1,10 +1,11 @@
 # Fork notes
 
-This is [dhruvkelawala/visual-explainer](https://github.com/dhruvkelawala/visual-explainer), a fork of [nicobailon/visual-explainer](https://github.com/nicobailon/visual-explainer) with three changes:
+This is [dhruvkelawala/visual-explainer](https://github.com/dhruvkelawala/visual-explainer), a fork of [nicobailon/visual-explainer](https://github.com/nicobailon/visual-explainer) with four changes:
 
 - The **Field Guide** look is a kit register and the renderer's default, in light and dark with a switch. It replaces Blueprint.
 - In T3 Code, pages show as **T3 visual pages** through `html_preview` and `html_render`, and pick light or dark from T3's background.
 - A **teaching page** shape, taken over from research-explainer, builds a topic from scratch in 3 to 7 blocks.
+- A **`walkthrough`** subcommand (`commands/walkthrough.md`, `references/walkthrough.md`) that teaches an existing explainer in plain English, one section per turn.
 
 It last merged upstream at v0.15.0.
 
@@ -13,9 +14,9 @@ It last merged upstream at v0.15.0.
 | `kit/field-guide.css`, `kit/theme.js` | New: the register's tokens, its restyle of the kit's parts, its own parts (`.fg-*`), and the T3 block; the head script that sets light or dark and adds the switch. |
 | `kit/render.mjs` | A `field-guide` entry in `FONTS`, Field Guide as the default register, both new files inlined on a Field Guide page, and `--t3` (or `t3: true`), which leaves out the reader-reply UI that T3's frame rejects. |
 | `templates/field-guide.src.html` | New: the reference source, which uses every Field Guide part. The test renders it. |
-| `references/field-guide.md`, `references/t3.md`, `references/teaching.md` | New: the register and its parts, the T3 steps, the teaching page shape. |
-| `SKILL.md`, `references/style-guide.md`, `references/kit.md`, `references/slides.md` | Field Guide as the house register in place of Blueprint. `SKILL.md` also has the T3 step under `## Deliver`, the teaching page row, and teaching pages in its `description`. |
-| `commands/fact-check.md`, `commands/generate-web-diagram.md` | Show pages by the Deliver rules instead of a browser. |
+| `references/field-guide.md`, `references/t3.md`, `references/teaching.md`, `references/walkthrough.md` | New: the register and its parts, the T3 steps, the teaching page shape, and the plain-English section-by-section walkthrough flow. |
+| `SKILL.md`, `references/style-guide.md`, `references/kit.md`, `references/slides.md` | Field Guide as the house register in place of Blueprint. `SKILL.md` also has the T3 step under `## Deliver`, the teaching page row, the walkthrough pointer, and both in its `description`. |
+| `commands/fact-check.md`, `commands/generate-web-diagram.md`, `commands/walkthrough.md` | Show pages by the Deliver rules instead of a browser; `walkthrough.md` adds the section-by-section walkthrough command (also exposed in `mcp/server.mjs` and `mcp/README.md`). |
 | `plan/plan.css`, `plan/render.mjs` | Plan pages use Field Guide tokens and fonts and get the light/dark switch. Overrides sit in one block at the end of `plan.css`. |
 | `test/`, `package.json` (repo root) | `npm test` renders the reference source and loads it in headless Chromium as T3 would host it. |
 

@@ -65,6 +65,7 @@ The server exposes the bundled command templates as MCP prompts:
 - `compare`
 - `fact-check`
 - `state-machine`
+- `walkthrough`
 
 Pass `request` to fill the template's `$@` argument.
 
